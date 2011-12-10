@@ -12,12 +12,22 @@
 /* -----------------------------------------
    Shared Styles
 ----------------------------------------- */
+.rounded-corners {
+  -moz-border-radius: 10px; /* Firefox */
+  -webkit-border-radius: 10px; /* Safari, Chrome */
+  border-radius: 10px; /* CSS3 */
+}
+
 body {
   background-color: green;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: "Proxima", "Helvetica Neue", "Helvetica", Arial, sans-serif;
+}
+
+a, a:hover, a:visited {
+  color: gold;
 }
 
 #topbar {
@@ -39,7 +49,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #topbar h1 a {
-  color: gold;
   font-weight: bold;
 }
 
@@ -54,11 +63,19 @@ h1, h2, h3, h4, h5, h6 {
 
 #topbar strong a {
   line-height: 14px;
-  color: gold;
   font-weight: 500;
   padding-right: 12px;
 }
 
+footer.row {
+  margin-top: 50px;
+  padding: 20px;
+  background-color: #009000;
+}
+
+/* -----------------------------------------
+   Index
+----------------------------------------- */
 #header {
   min-height: 600px !important;
   background-image: url(../images/gift-bg.png);
@@ -70,7 +87,7 @@ h1, h2, h3, h4, h5, h6 {
 header {
   text-align: center;
   position: relative;
-  margin-top: 40px;
+  margin-top: 20px;
 }
 
 header h1 {
@@ -89,12 +106,21 @@ header h2 {
   padding: 0 23%;
 }
 
-/* -----------------------------------------
-   Page Name 1
------------------------------------------ */
+header p {
+  margin-top: 8px;
+  color: gold;
+}
 
+header p a {
+  margin-right: 20px;
+  font-size: 12px;
+  font-size: 1.2rem;
+}
 
-
+#main {
+  position: relative;
+  top: -310px;
+}
 
 /* -----------------------------------------
    Page Name 2
