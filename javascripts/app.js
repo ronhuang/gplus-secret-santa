@@ -10,6 +10,66 @@ $(document).ready(function () {
     });
   });
 
+
+  /*  */
+  var goodRegistered = function(data, status) {
+    // message for log
+    var message;
+    if (data.result == 'success') {
+      message = '<div class="alert-box success">' +
+        '工號 ' + data.ident + ' 成功登錄。' +
+        '</div>';
+    } else if (data.result == 'duplicated') {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '工號 ' + data.ident + ' 已被登錄。' +
+        '</div>';
+    } else if (data.result == 'invalid_ident') {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '工號 ' + data.ident + ' 不正確。' +
+        '</div>';
+    } else {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '工號 ' + data.ident + ' 登錄失敗。' +
+        '</div>';
+    }
+    $(message).prependTo('#log').fadeIn();
+
+    // show success dialog
+    if (data.result == 'success') {
+      $('#rgsm .ident').text(data.ident);
+      $('#rgsm .passwd').text(data.passwd);
+      $('#rgsm .gift').text(data.gift);
+      $('#rgsm').reveal();
+    }
+
+    // clear field value if success
+    if (data.result == 'success') {
+      $('#rg input[name=ident]').val('');
+    }
+  };
+
+
+  /* register good child */
+  $('#rg').submit(function (e) {
+    e.preventDefault();
+
+    var field = $('#rg input[name=ident]');
+
+    var length = field.val().length;
+    if (length != 5) {
+      console.log('aaa');
+      var container = $('#log');
+      var message = '<div class="alert-box error" style="display: none;">' +
+        '工號要有五個字元。' +
+        '</div>';
+      $(message).prependTo(container).fadeIn('slow');
+      return;
+    }
+
+    $.post('/api/good/register', $('#rg').serialize(), goodRegistered, 'json');
+  });
+
+
   /* TABS --------------------------------- */
   /* Remove if you don't need :) */
 
