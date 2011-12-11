@@ -10,7 +10,7 @@
     <!-- Set the viewport width to device width for mobile -->
     <meta name="viewport" content="width=device-width" />
 
-    <title>聖誕節禮物交換網站</title>
+    <title>聖誕助手 - 聖誕節禮物交換網站</title>
 
     <!-- Included CSS Files -->
     <!-- Combine and Compress These CSS Files -->
@@ -34,7 +34,7 @@
         <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 </head>
-<body class="home">
+<body>
   <!-- topbar -->
   <div id="topbar" class="container">
     <div class="row">
@@ -52,32 +52,41 @@
     </div>
   </div>
 
-  <!-- header -->
-  <div id="header" class="container">
-    <div class="row">
-      <header class="twelve columns">
-        <h1>聖誕節禮物交換網站</h1>
-        <h2>記得故事書裡的主角，很期待耶誕節當天看到耶誕樹下放滿禮物，透過這個活動，將延續這種感動。</h2>
-        <a id="mainEntry" href="good" class="nice green button">乖小孩子從這邊進入</a>
-        <p>
-          <a href="helper">聖誕助手 »</a>
-          <a href="welfare">福委專區 »</a>
-        </p>
-      </header>
-    </div>
-  </div>
-
   <!-- main -->
-  <div id="home" class="container">
+  <div id="main" class="container">
     <section class="row">
-      <article class="five columns centered">
-        <div id="presents">
-          <img src="images/gift-sample.jpg" alt="聖誕快樂" data-caption="#gift-sample" />
-          <img src="images/gift-sample2.jpg" alt="聖誕快樂" data-caption="#gift-sample2" />
+      <div id="sidebar" class="five columns hide-on-phones">
+      </div>
+      <div class="seven columns">
+        <h3>聖誕助手</h3>
+        <h4 class="subheader">TODO</h4>
+        <hr>
+        <div class="row">
+          <div class="six columns">
+            <h4>登錄乖小孩子</h4>
+            <form class="nice" action="/api/helper/register" method="post">
+              <label for="form-identification">工號</label>
+              <input type="text" placeholder="00289" class="small input-text"
+                     name="identification" id="form-identification" maxlength="5">
+              <input type="hidden" name="action" value="register">
+              <button type="submit" class="small red nice button radius">登錄</button>
+            </form>
+          </div>
+          <div class="six columns">
+            <h4>移除乖小孩子</h4>
+            <form class="nice" action="/api/helper/delete" method="post">
+              <label for="form-identification">工號</label>
+              <input type="text" placeholder="00289" class="small input-text"
+                     name="identification" id="form-identification" maxlength="5">
+              <input type="hidden" name="action" value="register">
+              <button type="submit" class="small red nice button radius">移除</button>
+            </form>
+          </div>
         </div>
-        <span class="orbit-caption" id="gift-sample">聖誕快樂</span>
-        <span class="orbit-caption" id="gift-sample2">新年快樂</span>
-      </article>
+        <hr>
+        <div class="row">
+        </div>
+      </div>
     </section>
 
     <footer class="row rounded-corners">

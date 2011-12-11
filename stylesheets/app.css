@@ -18,10 +18,6 @@
   border-radius: 10px; /* CSS3 */
 }
 
-body {
-  background-color: green;
-}
-
 h1, h2, h3, h4, h5, h6 {
   font-family: "Proxima", "Helvetica Neue", "Helvetica", Arial, sans-serif;
 }
@@ -68,17 +64,20 @@ a, a:hover, a:visited {
 }
 
 footer.row {
-  margin-top: 50px;
   padding: 20px;
   background-color: #009000;
 }
 
 /* -----------------------------------------
-   Index
+   Home page
 ----------------------------------------- */
+body.home {
+  background-color: green;
+}
+
 #header {
   min-height: 600px !important;
-  background-image: url(../images/gift-bg.png);
+  background-image: url(/images/gift-bg.png);
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -117,13 +116,26 @@ header p a {
   font-size: 1.2rem;
 }
 
-#main {
+#home {
   position: relative;
   top: -310px;
 }
 
-/* -----------------------------------------
-   Page Name 2
------------------------------------------ */
+#home section {
+  margin-bottom: 50px;
+}
 
+/* -----------------------------------------
+   Helper page
+----------------------------------------- */
+#main {
+}
+
+#sidebar {
+  min-height: 600px !important;
+  background-image: url(/images/helper-bg.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
 

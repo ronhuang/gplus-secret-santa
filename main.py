@@ -32,7 +32,7 @@ class HomeHandler(BaseHandler):
 class HelperHandler(BaseHandler):
 
     def get(self):
-        self.render_template('home.html')
+        self.render_template('helper.html')
 
 
 class GoodHandler(BaseHandler):
