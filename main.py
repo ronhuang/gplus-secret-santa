@@ -5,78 +5,58 @@
 # See MIT-LICENSE.txt for details.
 
 
-from google.appengine.dist import use_library
-use_library('django', '1.2')
-
+import webapp2
+from webapp2_extras import jinja2
 import os
 import time
-from datetime import datetime, timedelta
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp import util
-from google.appengine.ext.webapp import template
+import datetime
 
 
-class HomeHandler(webapp.RequestHandler):
+class BaseHandler(webapp2.RequestHandler):
 
-    def get(self):
-        args = {}
+    @webapp2.cached_property
+    def jinja2(self):
+        return jinja2.get_jinja2(app=self.app)
 
-        dirname = os.path.dirname(__file__)
-        path = os.path.join(dirname, 'views', "home.html")
-        self.response.out.write(template.render(path, args))
+    def render_template(self, filename, **template_args):
+        body = self.jinja2.render_template(filename, **template_args)
+        self.response.write(body)
 
 
-class HelperHandler(webapp.RequestHandler):
+class HomeHandler(BaseHandler):
 
     def get(self):
-        args = {}
-
-        dirname = os.path.dirname(__file__)
-        path = os.path.join(dirname, 'views', "home.html")
-        self.response.out.write(template.render(path, args))
+        self.render_template('home.html')
 
 
-class GoodHandler(webapp.RequestHandler):
+class HelperHandler(BaseHandler):
 
     def get(self):
-        args = {}
-
-        dirname = os.path.dirname(__file__)
-        path = os.path.join(dirname, 'views', "home.html")
-        self.response.out.write(template.render(path, args))
+        self.render_template('home.html')
 
 
-class WelfareHandler(webapp.RequestHandler):
+class GoodHandler(BaseHandler):
 
     def get(self):
-        args = {}
-
-        dirname = os.path.dirname(__file__)
-        path = os.path.join(dirname, 'views', "home.html")
-        self.response.out.write(template.render(path, args))
+        self.render_template('home.html')
 
 
-class AboutHandler(webapp.RequestHandler):
+class WelfareHandler(BaseHandler):
 
     def get(self):
-        args = {}
-
-        dirname = os.path.dirname(__file__)
-        path = os.path.join(dirname, 'views', "home.html")
-        self.response.out.write(template.render(path, args))
+        self.render_template('home.html')
 
 
-def main():
-    actions = [
+class AboutHandler(BaseHandler):
+
+    def get(self):
+        self.render_template('home.html')
+
+
+application = webapp2.WSGIApplication([
         ('/', HomeHandler),
         ('/helper', HelperHandler),
         ('/good', GoodHandler),
-        ('/welfare', WalfareHandler),
+        ('/welfare', WelfareHandler),
         ('/about', AboutHandler),
-        ]
-    application = webapp.WSGIApplication(actions, debug=True)
-    util.run_wsgi_app(application)
-
-
-if __name__ == '__main__':
-    main()
+        ], debug=True)

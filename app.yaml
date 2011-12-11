@@ -1,7 +1,19 @@
 application: gplus-secret-santa
 version: 1
-runtime: python
+runtime: python27
 api_version: 1
+threadsafe: true
+
+libraries:
+- name: jinja2
+  version: latest
+- name: markupsafe
+  version: latest
+
+handlers:
+- url: /humans.txt
+  static_files: humans.txt
+  upload: humans.txt
 
 - url: /robots.txt
   static_files: robots.txt
@@ -21,4 +33,4 @@ api_version: 1
   static_dir: javascripts
 
 - url: .*
-  script: main.py
+  script: main.application
