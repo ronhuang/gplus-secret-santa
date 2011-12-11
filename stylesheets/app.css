@@ -12,12 +12,6 @@
 /* -----------------------------------------
    Shared Styles
 ----------------------------------------- */
-.rounded-corners {
-  -moz-border-radius: 10px; /* Firefox */
-  -webkit-border-radius: 10px; /* Safari, Chrome */
-  border-radius: 10px; /* CSS3 */
-}
-
 h1, h2, h3, h4, h5, h6 {
   font-family: "Proxima", "Helvetica Neue", "Helvetica", Arial, sans-serif;
 }
@@ -29,7 +23,7 @@ a, a:hover, a:visited {
 #topbar {
   background: green;
   border-bottom: solid 4px red;
-  padding: 15px 20px 13px 20px;
+  padding: 15px 20px 13px;
 }
 
 #topbar h1, #topbar h2 {
@@ -63,9 +57,8 @@ a, a:hover, a:visited {
   padding-right: 12px;
 }
 
-footer.row {
-  padding: 20px;
-  background-color: #009000;
+#footer {
+  margin-top: 10px;
 }
 
 /* -----------------------------------------
@@ -114,15 +107,6 @@ header p a {
   margin-right: 20px;
   font-size: 12px;
   font-size: 1.2rem;
-}
-
-#home {
-  position: relative;
-  top: -310px;
-}
-
-#home section {
-  margin-bottom: 50px;
 }
 
 /* -----------------------------------------
