@@ -11,13 +11,13 @@ $(document).ready(function () {
   });
 
 
-  /*  */
+  /* register good child */
   var goodRegistered = function(data, status) {
     // message for log
     var message;
     if (data.result == 'success') {
       message = '<div class="alert-box success">' +
-        '工號 ' + data.ident + ' 成功登錄。' +
+        '工號 ' + data.ident + ' 登錄成功。' +
         '</div>';
     } else if (data.result == 'duplicated') {
       message = '<div class="alert-box error" style="display: none;">' +
@@ -47,9 +47,6 @@ $(document).ready(function () {
       $('#rg input[name=ident]').val('');
     }
   };
-
-
-  /* register good child */
   $('#rg').submit(function (e) {
     e.preventDefault();
 
@@ -57,16 +54,66 @@ $(document).ready(function () {
 
     var length = field.val().length;
     if (length != 5) {
-      console.log('aaa');
-      var container = $('#log');
       var message = '<div class="alert-box error" style="display: none;">' +
         '工號要有五個字元。' +
         '</div>';
-      $(message).prependTo(container).fadeIn('slow');
+      $(message).prependTo('#log').fadeIn();
       return;
     }
 
     $.post('/api/good/register', $('#rg').serialize(), goodRegistered, 'json');
+  });
+
+
+  /* delete good child */
+  var goodDeleted = function(data, status) {
+    // message for log
+    var message;
+    if (data.result == 'success') {
+      message = '<div class="alert-box success">' +
+        '工號 ' + data.ident + ' 已被移除。' +
+        '</div>';
+    } else if (data.result == 'nonexist') {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '工號 ' + data.ident + ' 不存在。' +
+        '</div>';
+    } else if (data.result == 'invalid_ident') {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '工號 ' + data.ident + ' 不正確。' +
+        '</div>';
+    } else {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '工號 ' + data.ident + ' 移除失敗。' +
+        '</div>';
+    }
+    $(message).prependTo('#log').fadeIn();
+
+    // clear field value if success
+    if (data.result == 'success') {
+      $('#dg input[name=ident]').val('');
+    }
+  };
+  $('#dgsm .delete').click(function() {
+    $.post('/api/good/delete', $('#dg').serialize(), goodDeleted, 'json');
+    $('#dgsm').trigger('reveal:close');
+  });
+  $('#dg').submit(function (e) {
+    e.preventDefault();
+
+    var field = $('#dg input[name=ident]');
+
+    var length = field.val().length;
+    if (length != 5) {
+      var message = '<div class="alert-box error" style="display: none;">' +
+        '工號要有五個字元。' +
+        '</div>';
+      $(message).prependTo('#log').fadeIn();
+      return;
+    }
+
+    // show confirmation dialog
+    $('#dgsm .ident').text(field.val());
+    $('#dgsm').reveal();
   });
 
 

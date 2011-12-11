@@ -139,7 +139,10 @@ class GoodApiHandler(BaseHandler):
                 if not good:
                     args['result'] = 'nonexist'
                 else:
+                    gift = good.give_set.get()
+                    gift.delete()
                     good.delete()
+                    add_log("good: %s and gift: %s deleted." % (good.ident, gift.ident))
                     args['result'] = 'success'
             else:
                 args['result'] = 'invalid_ident'
