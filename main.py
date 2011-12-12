@@ -6,6 +6,7 @@
 
 
 import webapp2
+from webapp2 import Route
 from webapp2_extras import jinja2
 from webapp2_extras import sessions
 import os
@@ -87,7 +88,7 @@ class HelperHandler(BaseHandler):
         ident = self.session.get('ident')
 
         if not ident:
-            return self.redirect('/login?returnpath=/helper')
+            return self.redirect_to("login", returnpath=self.uri_for("helper"))
 
         self.render_template('helper.html')
 
@@ -199,11 +200,11 @@ config['webapp2_extras.sessions'] = {
 }
 
 application = webapp2.WSGIApplication([
-        ('/', HomeHandler),
-        ('/helper', HelperHandler),
-        ('/good', GoodHandler),
-        ('/api/good/(register|delete)', GoodApiHandler),
-        ('/welfare', WelfareHandler),
-        ('/about', AboutHandler),
-        ('/login', LoginHandler),
+        Route(r'/', handler=HomeHandler, name='home'),
+        Route(r'/helper', handler=HelperHandler, name='helper'),
+        Route(r'/good', handler=GoodHandler, name='good'),
+        Route(r'/api/good/(register|delete)', handler=GoodApiHandler, name='good-api'),
+        Route(r'/welfare', handler=WelfareHandler, name='welfare'),
+        Route(r'/about', handler=AboutHandler, name='about'),
+        Route(r'/login', handler=LoginHandler, name='login'),
         ], config=config, debug=True)
