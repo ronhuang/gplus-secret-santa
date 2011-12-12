@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>{% block base_title %}聖誕節禮物交換網站{% endblock %}</title>
+
+    <!-- Included CSS Files -->
+    <!-- Combine and Compress These CSS Files -->
+    <link rel="stylesheet" href="stylesheets/globals.css">
+    <link rel="stylesheet" href="stylesheets/typography.css">
+    <link rel="stylesheet" href="stylesheets/grid.css">
+    <link rel="stylesheet" href="stylesheets/ui.css">
+    <link rel="stylesheet" href="stylesheets/forms.css">
+    <link rel="stylesheet" href="stylesheets/orbit.css">
+    <link rel="stylesheet" href="stylesheets/reveal.css">
+    <link rel="stylesheet" href="stylesheets/mobile.css">
+    <!-- End Combine and Compress These CSS Files -->
+    <link rel="stylesheet" href="stylesheets/app.css">
+
+    <!--[if lt IE 9]>
+        <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+
+    <!-- IE Fix for HTML5 Tags -->
+    <!--[if lt IE 9]>
+        <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+  <!-- topbar -->
+  <div id="topbar" class="container">
+    <div class="row">
+      <div class="four columns">
+        <h1><a href="/">聖誕節禮物交換網站</a></h1>
+      </div>
+      <div class="eight columns hide-on-phones">
+      	<strong class="right">
+      	  <a href="/good">乖小孩子</a>
+      	  <a href="/helper">聖誕助手</a>
+      	  <a href="/welfare">福委專區</a>
+      	  <a href="/about">關於活動</a>
+      	</strong>
+      </div>
+    </div>
+  </div>
+
+  {% block base_content %}
+  {% endblock %}
+
+  <div id="footer" class="container">
+    <footer class="row rounded-corners">
+	  <section class="five columns">
+	    <h6><strong>福委會</strong></h6>
+        <p>TODO: 福委會簡介</p>
+	  </section>
+
+	  <section class="three columns">
+	    <h6><strong>開放原始碼</strong></h6>
+	    <p>https://github.com/ronhuang/gplus-secret-santa</p>
+	  </section>
+
+	  <section class="four columns">
+	    <h6><strong>需要協助嗎？</strong></h6>
+	    <p>請聯絡 TODO</p>
+      </section>
+    </footer>
+  </div>
+
+  {% block dialog %}
+  {% endblock %}
+
+  <!-- Included JS Files -->
+  <!-- Combine and Compress These JS Files -->
+  <script src="javascripts/jquery.min.js"></script>
+  <script src="javascripts/jquery.reveal.js"></script>
+  <script src="javascripts/jquery.orbit-1.3.0.js"></script>
+  <script src="javascripts/forms.jquery.js"></script>
+  <script src="javascripts/jquery.customforms.js"></script>
+  <script src="javascripts/jquery.placeholder.min.js"></script>
+  <!-- End Combine and Compress These JS Files -->
+  <script src="javascripts/app.js"></script>
+
+</body>
+</html>

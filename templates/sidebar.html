@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block base_title %}{% block title %}{% endblock %} - {{ super() }}{% endblock %}
+
+{% block base_content %}
+  <!-- main -->
+  <div id="main" class="container">
+    <section class="row">
+      <div id="sidebar" class="five columns hide-on-phones">
+      </div>
+      <div class="seven columns">
+        <h3>{% block subtitle %}{% endblock %}</h3>
+        <h4 class="subheader">{% block subheader %}FIXME{% endblock %}</h4>
+        <hr>
+        {% block content %}
+        {% endblock %}
+      </div>
+    </section>
+  </div>
+{% endblock %}
