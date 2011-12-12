@@ -84,6 +84,11 @@ class HomeHandler(BaseHandler):
 
 class HelperHandler(BaseHandler):
     def get(self):
+        ident = self.session.get('ident')
+
+        if not ident:
+            return self.redirect('/login?returnpath=/helper')
+
         self.render_template('helper.html')
 
 
@@ -182,6 +187,12 @@ class AboutHandler(BaseHandler):
         self.render_template('home.html')
 
 
+class LoginHandler(BaseHandler):
+    def get(self):
+        path = self.request.get('returnpath')
+        self.render_template('login.html', returnpath=path)
+
+
 config = {}
 config['webapp2_extras.sessions'] = {
     'secret_key': prefs.SESSIONS_SECRET_KEY,
@@ -194,4 +205,5 @@ application = webapp2.WSGIApplication([
         ('/api/good/(register|delete)', GoodApiHandler),
         ('/welfare', WelfareHandler),
         ('/about', AboutHandler),
+        ('/login', LoginHandler),
         ], config=config, debug=True)
