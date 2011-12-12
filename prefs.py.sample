@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+# Generalplus Secret Santa
+# Copyright 2011 Ron Huang
+# See MIT-LICENSE.txt for details.
+
+
+SESSIONS_SECRET_KEY = "my-super-secret-key"

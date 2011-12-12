@@ -7,6 +7,7 @@
 
 import webapp2
 from webapp2_extras import jinja2
+from webapp2_extras import sessions
 import os
 import time
 import datetime
@@ -15,6 +16,7 @@ import random
 import string
 import hashlib
 from google.appengine.ext import db
+import prefs
 
 
 class Log(db.Model):
@@ -56,6 +58,23 @@ class BaseHandler(webapp2.RequestHandler):
     def render_template(self, filename, **template_args):
         body = self.jinja2.render_template(filename, **template_args)
         self.response.write(body)
+
+    def dispatch(self):
+        # Get a session store for this request.
+        self.session_store = sessions.get_store(request=self.request)
+
+        try:
+            # Dispatch the request.
+            #webapp2.RequestHandler.dispatch(self)
+            super(BaseHandler, self).dispatch()
+        finally:
+            # Save all sessions.
+            self.session_store.save_sessions(self.response)
+
+    @webapp2.cached_property
+    def session(self):
+        # Returns a session using the default cookie key.
+        return self.session_store.get_session()
 
 
 class HomeHandler(BaseHandler):
@@ -163,6 +182,11 @@ class AboutHandler(BaseHandler):
         self.render_template('home.html')
 
 
+config = {}
+config['webapp2_extras.sessions'] = {
+    'secret_key': prefs.SESSIONS_SECRET_KEY,
+}
+
 application = webapp2.WSGIApplication([
         ('/', HomeHandler),
         ('/helper', HelperHandler),
@@ -170,4 +194,4 @@ application = webapp2.WSGIApplication([
         ('/api/good/(register|delete)', GoodApiHandler),
         ('/welfare', WelfareHandler),
         ('/about', AboutHandler),
-        ], debug=True)
+        ], config=config, debug=True)
