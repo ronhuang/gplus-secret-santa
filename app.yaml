@@ -32,5 +32,9 @@ handlers:
 - url: /javascripts
   static_dir: javascripts
 
+- url: /admin
+  script: main.application
+  login: admin
+
 - url: .*
   script: main.application

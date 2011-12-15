@@ -11,8 +11,8 @@ $(document).ready(function () {
   });
 
 
-  /* register good child */
-  var goodRegistered = function(data, status) {
+  /* register */
+  var registered = function(data, status) {
     // message for log
     var message;
     if (data.result == 'success') {
@@ -36,21 +36,21 @@ $(document).ready(function () {
 
     // show success dialog
     if (data.result == 'success') {
-      $('#rgsm .ident').text(data.ident);
-      $('#rgsm .passwd').text(data.passwd);
-      $('#rgsm .gift').text(data.gift);
-      $('#rgsm').reveal();
+      $('#register-dialog .ident').text(data.ident);
+      $('#register-dialog .passwd').text(data.passwd);
+      $('#register-dialog .gift').text(data.gift);
+      $('#register-dialog').reveal();
     }
 
     // clear field value if success
     if (data.result == 'success') {
-      $('#rg input[name=ident]').val('');
+      $('#register input[name=ident]').val('');
     }
   };
-  $('#rg').submit(function (e) {
+  $('#register').submit(function (e) {
     e.preventDefault();
 
-    var field = $('#rg input[name=ident]');
+    var field = $('#register input[name=ident]');
 
     var length = field.val().length;
     if (length != 5) {
@@ -61,12 +61,13 @@ $(document).ready(function () {
       return;
     }
 
-    $.post('/api/good/register', $('#rg').serialize(), goodRegistered, 'json');
+    var action = $('#register').attr('action');
+    $.post(action, $('#register').serialize(), registered, 'json');
   });
 
 
   /* delete good child */
-  var goodDeleted = function(data, status) {
+  var deleted = function(data, status) {
     // message for log
     var message;
     if (data.result == 'success') {
@@ -90,17 +91,18 @@ $(document).ready(function () {
 
     // clear field value if success
     if (data.result == 'success') {
-      $('#dg input[name=ident]').val('');
+      $('#delete input[name=ident]').val('');
     }
   };
-  $('#dgsm .delete').click(function() {
-    $.post('/api/good/delete', $('#dg').serialize(), goodDeleted, 'json');
-    $('#dgsm').trigger('reveal:close');
+  $('#delete-dialog .delete').click(function() {
+    var action = $('#delete').attr('action');
+    $.post(action, $('#delete').serialize(), deleted, 'json');
+    $('#delete-dialog').trigger('reveal:close');
   });
-  $('#dg').submit(function (e) {
+  $('#delete').submit(function (e) {
     e.preventDefault();
 
-    var field = $('#dg input[name=ident]');
+    var field = $('#delete input[name=ident]');
 
     var length = field.val().length;
     if (length != 5) {
@@ -112,8 +114,8 @@ $(document).ready(function () {
     }
 
     // show confirmation dialog
-    $('#dgsm .ident').text(field.val());
-    $('#dgsm').reveal();
+    $('#delete-dialog .ident').text(field.val());
+    $('#delete-dialog').reveal();
   });
 
 

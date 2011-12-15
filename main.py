@@ -5,6 +5,7 @@
 # See MIT-LICENSE.txt for details.
 
 
+import logging
 import webapp2
 from webapp2 import Route
 from webapp2_extras import jinja2
@@ -20,19 +21,22 @@ from google.appengine.ext import db
 import prefs
 
 
-class Log(db.Model):
-    message = db.StringProperty(required=True)
-    created = db.DateTimeProperty(auto_now_add=True)
+ROLE_ADMIN = 0
+ROLE_WELFARE = 1000
+ROLE_HELPER = 2000
+ROLE_GOOD = 3000
 
 
-class Good(db.Model):
+class User(db.Model):
     ident = db.StringProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(auto_now=True)
-    passwd = db.StringProperty(required=True)
+    passwd = db.StringProperty()
     addedMessage = db.BooleanProperty()
     checkedFirstDraw = db.BooleanProperty()
     checkedSecondDraw = db.BooleanProperty()
+    executive = db.BooleanProperty(default=False)
+    role = db.IntegerProperty(required=True)
 
 
 class Gift(db.Model):
@@ -42,13 +46,19 @@ class Gift(db.Model):
     description = db.StringProperty()
     message = db.StringProperty()
     picture = db.BlobProperty()
-    giver = db.ReferenceProperty(Good, collection_name='give_set', required=True)
-    taker = db.ReferenceProperty(Good, collection_name='take_set')
+    giver = db.ReferenceProperty(User, collection_name='give_set', required=True)
+    taker = db.ReferenceProperty(User, collection_name='take_set')
 
 
 class Counter(db.Model):
     name = db.StringProperty(required=True)
     count = db.IntegerProperty(default=1)
+
+
+class Log(db.Model):
+    message = db.StringProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+    who = db.ReferenceProperty(User)
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -77,6 +87,19 @@ class BaseHandler(webapp2.RequestHandler):
         # Returns a session using the default cookie key.
         return self.session_store.get_session()
 
+    @webapp2.cached_property
+    def auth(self):
+        ident = self.session.get('ident')
+        if not ident:
+            return
+        query = db.GqlQuery("SELECT * FROM User WHERE ident = :1", ident)
+        user = query.get()
+        return user
+
+    def add_log(self, msg):
+        log = Log(message=msg, who=self.auth)
+        log.put()
+
 
 class HomeHandler(BaseHandler):
     def get(self):
@@ -85,10 +108,11 @@ class HomeHandler(BaseHandler):
 
 class HelperHandler(BaseHandler):
     def get(self):
-        ident = self.session.get('ident')
+        if not self.auth:
+            return self.redirect_to("login", returnpath="helper")
 
-        if not ident:
-            return self.redirect_to("login", returnpath=self.uri_for("helper"))
+        if self.auth.role >= ROLE_HELPER:
+            return self.render_template('bad.html')
 
         self.render_template('helper.html')
 
@@ -106,25 +130,27 @@ def inc_counter(key):
     return count
 
 
-def add_log(msg):
-    log = Log(message=msg)
-    log.put()
-
-
-class GoodApiHandler(BaseHandler):
+class UserApiHandler(BaseHandler):
     def post(self, action):
         args = {'action': action}
 
-        if action == 'register':
+        if not self.auth:
+            args['result'] = 'unauthorized'
+        elif action == 'register':
+            args['ident'] = self.request.get('ident')
             ident = self.request.get('ident')
-            args['ident'] = ident
+            args['role'] = self.request.get('role')
+            role = int(self.request.get('role'))
 
             if ident and len(ident) == 5:
-                query = db.GqlQuery("SELECT * FROM Good WHERE ident = :1", ident)
-                good = query.get()
+                query = db.GqlQuery("SELECT * FROM User WHERE ident = :1", ident)
+                user = query.get()
 
-                if good:
+                if user:
                     args['result'] = 'duplicated'
+                elif self.auth.role >= role:
+                    # lower role has greater permission
+                    arge['result'] = 'unauthorized'
                 else:
                     # create weak password
                     passwd = ''.join([random.choice(string.letters + string.digits) for i in range(6)])
@@ -138,15 +164,15 @@ class GoodApiHandler(BaseHandler):
                         counter.put()
                     count = db.run_in_transaction(inc_counter, counter.key())
 
-                    # create good
-                    good = Good(ident=ident, passwd=digest)
-                    good.put()
+                    # create user
+                    user = User(ident=ident, passwd=digest, role=role)
+                    user.put()
 
                     # create gift
-                    gift = Gift(ident=str(count), giver=good)
+                    gift = Gift(ident=str(count), giver=user)
                     gift.put()
 
-                    add_log("good: %s and gift: %s registered." % (good.ident, gift.ident))
+                    self.add_log("user '%s' and gift '%s' registered." % (user.ident, gift.ident))
 
                     args['result'] = 'success'
                     args['passwd'] = passwd
@@ -158,16 +184,19 @@ class GoodApiHandler(BaseHandler):
             args['ident'] = ident
 
             if ident and len(ident) == 5:
-                query = db.GqlQuery("SELECT * FROM Good WHERE ident = :1", ident)
-                good = query.get()
+                query = db.GqlQuery("SELECT * FROM User WHERE ident = :1", ident)
+                user = query.get()
 
-                if not good:
+                if not user:
                     args['result'] = 'nonexist'
+                elif self.auth.role >= user.role:
+                    # lower role has greater permission
+                    arge['result'] = 'unauthorized'
                 else:
-                    gift = good.give_set.get()
+                    gift = user.give_set.get()
                     gift.delete()
-                    good.delete()
-                    add_log("good: %s and gift: %s deleted." % (good.ident, gift.ident))
+                    user.delete()
+                    self.add_log("user '%s' and gift '%s' deleted." % (user.ident, gift.ident))
                     args['result'] = 'success'
             else:
                 args['result'] = 'invalid_ident'
@@ -194,6 +223,30 @@ class LoginHandler(BaseHandler):
         self.render_template('login.html', returnpath=path)
 
 
+class LoginApiHandler(BaseHandler):
+    def post(self):
+        ident = self.request.get('ident')
+        passwd = self.request.get('passwd')
+        returnpath = self.request.get('returnpath')
+
+        # authenticate
+
+        return self.redirect_to(returnpath)
+
+
+class AdminHandler(BaseHandler):
+    def get(self):
+        # add admin is not already exist
+        query = db.GqlQuery("SELECT * FROM User WHERE ident = 0")
+        user = query.get()
+        if not user:
+            user = User(ident='0', role=ROLE_ADMIN)
+            user.put()
+
+        self.session['ident'] = '0'
+        self.render_template('admin.html')
+
+
 config = {}
 config['webapp2_extras.sessions'] = {
     'secret_key': prefs.SESSIONS_SECRET_KEY,
@@ -203,8 +256,10 @@ application = webapp2.WSGIApplication([
         Route(r'/', handler=HomeHandler, name='home'),
         Route(r'/helper', handler=HelperHandler, name='helper'),
         Route(r'/good', handler=GoodHandler, name='good'),
-        Route(r'/api/good/(register|delete)', handler=GoodApiHandler, name='good-api'),
         Route(r'/welfare', handler=WelfareHandler, name='welfare'),
         Route(r'/about', handler=AboutHandler, name='about'),
         Route(r'/login', handler=LoginHandler, name='login'),
+        Route(r'/admin', handler=AdminHandler, name='admin'),
+        Route(r'/api/user/<action:register|delete>', handler=UserApiHandler, name='user-api'),
+        Route(r'/api/login', handler=LoginApiHandler, name='login-api'),
         ], config=config, debug=True)
