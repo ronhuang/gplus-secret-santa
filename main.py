@@ -38,6 +38,20 @@ class User(db.Model):
     executive = db.BooleanProperty(default=False)
     role = db.IntegerProperty(required=True)
 
+    def check_passwd(self, passwd):
+        return self.passwd == hashlib.md5(passwd).hexdigest()
+
+    def reset_passwd(self):
+        passwd, digest = User.create_passwd()
+        self.passwd = digest
+        self.put()
+        return passwd
+
+    @staticmethod
+    def create_passwd():
+        passwd = ''.join([random.choice(string.letters + string.digits) for i in range(6)])
+        return passwd, hashlib.md5(passwd).hexdigest()
+
 
 class Gift(db.Model):
     ident = db.StringProperty(required=True)
@@ -111,7 +125,7 @@ class HelperHandler(BaseHandler):
         if not self.auth:
             return self.redirect_to("login", returnpath="helper")
 
-        if self.auth.role >= ROLE_HELPER:
+        if self.auth.role >= ROLE_GOOD:
             return self.render_template('bad.html')
 
         self.render_template('helper.html')
@@ -150,12 +164,8 @@ class UserApiHandler(BaseHandler):
                     args['result'] = 'duplicated'
                 elif self.auth.role >= role:
                     # lower role has greater permission
-                    arge['result'] = 'unauthorized'
+                    args['result'] = 'unauthorized'
                 else:
-                    # create weak password
-                    passwd = ''.join([random.choice(string.letters + string.digits) for i in range(6)])
-                    digest = hashlib.md5(passwd).hexdigest()
-
                     # gift counter
                     q = db.GqlQuery('SELECT * FROM Counter WHERE name = :1', 'gift')
                     counter = q.get()
@@ -165,6 +175,7 @@ class UserApiHandler(BaseHandler):
                     count = db.run_in_transaction(inc_counter, counter.key())
 
                     # create user
+                    passwd, digest = User.create_passwd()
                     user = User(ident=ident, passwd=digest, role=role)
                     user.put()
 
@@ -191,12 +202,32 @@ class UserApiHandler(BaseHandler):
                     args['result'] = 'nonexist'
                 elif self.auth.role >= user.role:
                     # lower role has greater permission
-                    arge['result'] = 'unauthorized'
+                    args['result'] = 'unauthorized'
                 else:
                     gift = user.give_set.get()
                     gift.delete()
                     user.delete()
                     self.add_log("user '%s' and gift '%s' deleted." % (user.ident, gift.ident))
+                    args['result'] = 'success'
+            else:
+                args['result'] = 'invalid_ident'
+        elif action == 'reset':
+            ident = self.request.get('ident')
+            args['ident'] = ident
+
+            if ident and len(ident) == 5:
+                query = db.GqlQuery("SELECT * FROM User WHERE ident = :1", ident)
+                user = query.get()
+
+                if not user:
+                    args['result'] = 'nonexist'
+                elif self.auth.role >= user.role:
+                    # lower role has greater permission
+                    args['result'] = 'unauthorized'
+                else:
+                    passwd = user.reset_passwd()
+                    self.add_log("user '%s' password reset." % (user.ident))
+                    args['passwd'] = passwd
                     args['result'] = 'success'
             else:
                 args['result'] = 'invalid_ident'
@@ -209,7 +240,13 @@ class UserApiHandler(BaseHandler):
 
 class WelfareHandler(BaseHandler):
     def get(self):
-        self.render_template('home.html')
+        if not self.auth:
+            return self.redirect_to("login", returnpath="welfare")
+
+        if self.auth.role >= ROLE_HELPER:
+            return self.render_template('bad.html')
+
+        self.render_template('welfare.html')
 
 
 class AboutHandler(BaseHandler):
@@ -219,8 +256,22 @@ class AboutHandler(BaseHandler):
 
 class LoginHandler(BaseHandler):
     def get(self):
-        path = self.request.get('returnpath')
-        self.render_template('login.html', returnpath=path)
+        returnpath = self.request.get('returnpath')
+        unauthorized = False
+
+        flashes = self.session.get_flashes()
+        for flash in flashes:
+            unauthorized = unauthorized or ('unauthorized' in flash)
+
+        self.render_template('login.html',
+                             returnpath=returnpath,
+                             unauthorized=unauthorized)
+
+
+class LogoutHandler(BaseHandler):
+    def get(self):
+        self.session['ident'] = None
+        self.redirect_to('home')
 
 
 class LoginApiHandler(BaseHandler):
@@ -230,8 +281,17 @@ class LoginApiHandler(BaseHandler):
         returnpath = self.request.get('returnpath')
 
         # authenticate
-
-        return self.redirect_to(returnpath)
+        query = db.GqlQuery('SELECT * FROM User WHERE ident = :1', ident)
+        user = query.get()
+        isValidUser = user and user.ident != 0 and user.check_passwd(passwd)
+        if isValidUser and returnpath:
+            self.session['ident'] = ident
+            self.redirect_to(returnpath)
+        elif returnpath:
+            self.session.add_flash('unauthorized')
+            self.redirect_to('login', returnpath=returnpath)
+        else:
+            self.redirect_to('home')
 
 
 class AdminHandler(BaseHandler):
@@ -259,7 +319,8 @@ application = webapp2.WSGIApplication([
         Route(r'/welfare', handler=WelfareHandler, name='welfare'),
         Route(r'/about', handler=AboutHandler, name='about'),
         Route(r'/login', handler=LoginHandler, name='login'),
+        Route(r'/logout', handler=LogoutHandler, name='logout'),
         Route(r'/admin', handler=AdminHandler, name='admin'),
-        Route(r'/api/user/<action:register|delete>', handler=UserApiHandler, name='user-api'),
+        Route(r'/api/user/<action:register|delete|reset>', handler=UserApiHandler, name='user-api'),
         Route(r'/api/login', handler=LoginApiHandler, name='login-api'),
         ], config=config, debug=True)

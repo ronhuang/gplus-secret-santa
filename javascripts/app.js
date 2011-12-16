@@ -119,6 +119,60 @@ $(document).ready(function () {
   });
 
 
+  /* reset passwd */
+  var passwdReset = function(data, status) {
+    // message for log
+    var message;
+    if (data.result == 'success') {
+      message = '<div class="alert-box success">' +
+        '工號 ' + data.ident + ' 密碼重置成功。' +
+        '</div>';
+    } else if (data.result == 'nonexist') {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '工號 ' + data.ident + ' 不存在。' +
+        '</div>';
+    } else if (data.result == 'invalid_ident') {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '工號 ' + data.ident + ' 不正確。' +
+        '</div>';
+    } else {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '工號 ' + data.ident + ' 密碼重置失敗。' +
+        '</div>';
+    }
+    $(message).prependTo('#log').fadeIn();
+
+    // show success dialog
+    if (data.result == 'success') {
+      $('#reset-dialog .ident').text(data.ident);
+      $('#reset-dialog .passwd').text(data.passwd);
+      $('#reset-dialog').reveal();
+    }
+
+    // clear field value if success
+    if (data.result == 'success') {
+      $('#reset input[name=ident]').val('');
+    }
+  };
+  $('#reset').submit(function (e) {
+    e.preventDefault();
+
+    var field = $('#reset input[name=ident]');
+
+    var length = field.val().length;
+    if (length != 5) {
+      var message = '<div class="alert-box error" style="display: none;">' +
+        '工號要有五個字元。' +
+        '</div>';
+      $(message).prependTo('#log').fadeIn();
+      return;
+    }
+
+    var action = $('#reset').attr('action');
+    $.post(action, $('#reset').serialize(), passwdReset, 'json');
+  });
+
+
   /* TABS --------------------------------- */
   /* Remove if you don't need :) */
 

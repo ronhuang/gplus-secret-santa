@@ -12,12 +12,15 @@
             <h4>登錄</h4>
             <form id="login" class="nice" action="/api/login" method="post">
               <label for="login-ident">工號</label>
-              <input type="text" placeholder="00289" class="small input-text"
+              <input type="text" placeholder="00289" class="medium input-text"
                      name="ident" id="login-ident" maxlength="5">
               <label for="login-passwd">密碼</label>
-              <input type="text" placeholder="請輸入密碼" class="small input-text"
-                     name="passwd" id="login-passwd" maxlength="5">
-              <input type="hidden" value="{{ returnpath }}">
+              <input type="password" placeholder="請輸入密碼" class="medium input-text"
+                     name="passwd" id="login-passwd">
+              <input type="hidden" name="returnpath" value="{{ returnpath }}">
+              {% if unauthorized %}
+			  <small class="error">帳號或密碼錯誤</small>
+              {% endif %}
               <button type="submit" class="small green nice button radius">登錄</button>
             </form>
           </div>

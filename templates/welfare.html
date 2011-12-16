@@ -1,30 +1,49 @@
 {% extends "sidebar.html" %}
 
-{% block title %}聖誕助手{% endblock %}
+{% block title %}福委專區{% endblock %}
 
-{% block subtitle %}聖誕助手{% endblock %}
+{% block subtitle %}福委專區{% endblock %}
 
-{% block subheader %}新增乖小孩子{% endblock %}
+{% block subheader %}新增小助手、切換抽獎狀態、檢視抽獎結果{% endblock %}
 
 {% block content %}
         <div class="row">
           <div class="six columns">
-            <h4>登錄乖小孩子</h4>
+            <h4>登錄小助手</h4>
             <form id="register" class="nice" action="/api/user/register" method="post">
               <label for="register-ident">工號</label>
               <input type="text" placeholder="00289" class="small input-text"
                      name="ident" id="register-ident" maxlength="5">
-              <input type="hidden" name="role" value="3000">
+              <input type="hidden" name="role" value="2000">
               <button type="submit" class="small green nice button radius">登錄</button>
             </form>
           </div>
           <div class="six columns">
-            <h4>移除乖小孩子</h4>
+            <h4>移除小助手</h4>
             <form id="delete" class="nice" action="/api/user/delete" method="post">
               <label for="delete-ident">工號</label>
               <input type="text" placeholder="00289" class="small input-text"
                      name="ident" id="delete-ident" maxlength="5">
               <button type="submit" class="small red nice button radius">移除</button>
+            </form>
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="six columns">
+            <h4>重置密碼</h4>
+            <form id="reset" class="nice" action="/api/user/reset" method="post">
+              <label for="reset-ident">工號</label>
+              <input type="text" placeholder="00289" class="small input-text"
+                     name="ident" id="reset-ident" maxlength="5">
+              <button type="submit" class="small green nice button radius">重置</button>
+            </form>
+          </div>
+          <div class="six columns">
+            <h4>變更抽獎階段</h4>
+            <form id="change-state" class="nice" action="/api/state/change" method="post">
+              <label for="delete-ident">階段</label>
+              <button type="submit" class="small red nice button radius">變更</button>
             </form>
           </div>
         </div>
@@ -38,8 +57,7 @@
 {% block dialog %}
   <div id="register-dialog" class="reveal-modal">
 	<h2>工號 <span class="ident"></span> 登錄成功</h2>
-	<p class="lead">密碼：<span class="passwd"></span>，禮物編號：<span class="gift"></span>。</p>
-	<p>乖小孩子要記牢密碼！不然得再跟福委申請。</p>
+	<p class="lead">密碼：<span class="passwd"></span>。</p>
     <a class="close-reveal-modal">×</a>
   </div>
 
@@ -49,5 +67,11 @@
 	<p>移除之後就不能回復！</p>
     <a class="close-reveal-modal">×</a>
     <button class="nice red radius button delete">移除</button>
+  </div>
+
+  <div id="reset-dialog" class="reveal-modal">
+	<h2>工號 <span class="ident"></span> 密碼重置成功</h2>
+	<p class="lead">密碼：<span class="passwd"></span>。</p>
+    <a class="close-reveal-modal">×</a>
   </div>
 {% endblock %}
