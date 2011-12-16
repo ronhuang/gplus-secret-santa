@@ -155,6 +155,7 @@ class UserApiHandler(BaseHandler):
             ident = self.request.get('ident')
             args['role'] = self.request.get('role')
             role = int(self.request.get('role'))
+            executive = self.request.get('executive') and True or False
 
             if ident and len(ident) == 5:
                 query = db.GqlQuery("SELECT * FROM User WHERE ident = :1", ident)
@@ -176,7 +177,7 @@ class UserApiHandler(BaseHandler):
 
                     # create user
                     passwd, digest = User.create_passwd()
-                    user = User(ident=ident, passwd=digest, role=role)
+                    user = User(ident=ident, passwd=digest, role=role, executive=executive)
                     user.put()
 
                     # create gift
