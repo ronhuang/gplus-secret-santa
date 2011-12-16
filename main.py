@@ -251,7 +251,7 @@ class WelfareHandler(BaseHandler):
 
 class AboutHandler(BaseHandler):
     def get(self):
-        self.render_template('home.html')
+        self.render_template('about.html')
 
 
 class LoginHandler(BaseHandler):

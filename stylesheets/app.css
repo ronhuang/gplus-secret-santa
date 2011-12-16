@@ -22,7 +22,7 @@ a, a:hover, a:visited {
 
 #topbar {
   background: green;
-  border-bottom: solid 4px red;
+  border-bottom: solid 4px #C60000;
   padding: 15px 20px 13px;
 }
 
@@ -126,3 +126,12 @@ header p a {
   background-size: cover;
 }
 
+/* -----------------------------------------
+   About page
+----------------------------------------- */
+#about {
+  min-height: 618px !important;
+  background-image: url(/images/about.jpg);
+  background-repeat: no-repeat;
+  background-position: center center;
+}
