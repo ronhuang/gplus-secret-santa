@@ -6,6 +6,8 @@
 
 {% block subheader %}禮物編號：{{ gift.ident }}{% endblock %}
 
+{% block class %}good{% endblock %}
+
 {% block content %}
         <h4>登錄禮物 <span title="{{ '已完成' if gift.is_complete else '尚未完成' }}">{{ '&#10004;'|safe if gift.is_complete else '&#10006;'|safe }}</span></h4>
         <div class="row">

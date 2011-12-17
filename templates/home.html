@@ -18,13 +18,20 @@
     <!-- presents -->
     <div class="row">
       <div class="five columns centered">
-        <div id="presents">
-          <img src="images/gift-sample.jpg" alt="聖誕快樂" data-caption="#gift-sample" />
-          <img src="images/gift-sample2.jpg" alt="聖誕快樂" data-caption="#gift-sample2" />
+        <div class="presents">
+          {% for gift in query %}
+          <img src="{{ gift.orbit_url }}" alt="{{ gift.message|e }}" data-caption="#gift-{{ loop.index }}" />
+          <span class="orbit-caption" id="gift-{{ loop.index }}"><a href="/gift/{{ gift.ident }}">#{{ gift.ident }}</a> {{ gift.message|e }}</span>
+          {% endfor %}
         </div>
-        <span class="orbit-caption" id="gift-sample">聖誕快樂</span>
-        <span class="orbit-caption" id="gift-sample2">新年快樂</span>
       </div>
     </div>
   </div>
+
+  <!--[if IE]>
+  <style type="text/css">
+    .timer { display: none !important; }
+    div.caption { background:transparent; filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000,endColorstr=#99000000);zoom: 1; }
+  </style>
+  <![endif]-->
 {% endblock %}

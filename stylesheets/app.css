@@ -111,6 +111,14 @@ header p a {
   font-size: 1.2rem;
 }
 
+.presents {
+  width: 383px;
+  height: 383px;
+  background-color: rgba(0, 0, 0, 0.0);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
 /* -----------------------------------------
    Helper page
 ----------------------------------------- */
@@ -131,6 +139,10 @@ header p a {
 ----------------------------------------- */
 .gift-thumbnail {
   width: 100%;
+}
+
+.good #sidebar {
+  background-image: url(/images/good-bg.png);
 }
 
 /* -----------------------------------------

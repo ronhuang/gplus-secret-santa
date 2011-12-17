@@ -34,7 +34,6 @@ STATE_MAINTENANCE = 5
 MIN_FILE_SIZE = 1 # bytes
 MAX_FILE_SIZE = 1000000 # bytes
 ACCEPT_FILE_TYPES = re.compile('image/(gif|p?jpeg|(x-)?png)')
-THUMBNAIL_MODIFICATOR = '=s250' # max width / height
 
 
 class User(db.Model):
@@ -84,7 +83,12 @@ class Gift(db.Model):
     @property
     def thumbnail_url(self):
         if self.picture:
-            return images.get_serving_url(self.picture) + THUMBNAIL_MODIFICATOR
+            return images.get_serving_url(self.picture, 250, False)
+
+    @property
+    def orbit_url(self):
+        if self.picture:
+            return images.get_serving_url(self.picture, 383, True)
 
 
 class Counter(db.Model):
@@ -146,7 +150,9 @@ class BaseHandler(webapp2.RequestHandler):
 
 class HomeHandler(BaseHandler):
     def get(self):
-        self.render_template('home.html')
+        query = db.GqlQuery("SELECT * FROM Gift WHERE picture != NULL ORDER BY picture DESC, updated DESC LIMIT 10")
+
+        self.render_template('home.html', query=query)
 
 
 class HelperHandler(BaseHandler):

@@ -5,7 +5,7 @@ $(document).ready(function () {
 
   /* Presents orbit */
   $(window).load(function() {
-    $('#presents').orbit({
+    $('.presents').orbit({
       animation: 'horizontal-push',
     });
   });
