@@ -17,7 +17,7 @@
               <label for="login-passwd">密碼</label>
               <input type="password" placeholder="請輸入密碼" class="medium input-text"
                      name="passwd" id="login-passwd">
-              <input type="hidden" name="returnpath" value="{{ returnpath }}">
+              <input type="hidden" name="returnpath" value="{{ returnpath|e }}">
               {% if unauthorized %}
 			  <small class="error">帳號或密碼錯誤</small>
               {% endif %}

@@ -26,13 +26,19 @@ ROLE_WELFARE = 1000
 ROLE_HELPER = 2000
 ROLE_GOOD = 3000
 
+STATE_REGISTER_START = 0
+STATE_REGISTER_END = 1
+STATE_GENERAL_RESULT = 2
+STATE_SPECIAL_RESULT = 3
+STATE_EVENT_END = 4
+STATE_MAINTENANCE = 5
+
 
 class User(db.Model):
     ident = db.StringProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(auto_now=True)
     passwd = db.StringProperty()
-    addedMessage = db.BooleanProperty()
     checkedFirstDraw = db.BooleanProperty()
     checkedSecondDraw = db.BooleanProperty()
     executive = db.BooleanProperty(default=False)
@@ -63,6 +69,10 @@ class Gift(db.Model):
     giver = db.ReferenceProperty(User, collection_name='give_set', required=True)
     taker = db.ReferenceProperty(User, collection_name='take_set')
 
+    @property
+    def is_complete(self):
+        return self.description and self.message and self.picture
+
 
 class Counter(db.Model):
     name = db.StringProperty(required=True)
@@ -76,7 +86,7 @@ class Log(db.Model):
 
 
 class State(db.Model):
-    state = db.IntegerProperty(required=True, default=0)
+    state = db.IntegerProperty(required=True, default=STATE_REGISTER_START)
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(auto_now=True)
 
@@ -139,7 +149,37 @@ class HelperHandler(BaseHandler):
 
 class GoodHandler(BaseHandler):
     def get(self):
-        self.render_template('home.html')
+        if not self.auth:
+            return self.redirect_to("login", returnpath="good")
+
+        if self.auth.role >= ROLE_GOOD:
+            return self.render_template('bad.html')
+
+        current = State.get_or_insert('current').state
+        if current == STATE_REGISTER_START:
+            self.register_gift()
+        elif current == STATE_REGISTER_END:
+            self.wait_for_result()
+        elif current == STATE_GENERAL_RESULT or current == STATE_SPECIAL_RESULT or current == STATE_EVENT_END:
+            self.result()
+        elif current == STATE_MAINTENANCE:
+            self.maintenance()
+        else:
+            self.redirect_to('home')
+
+    def register_gift(self):
+        gift = self.auth.give_set.get()
+
+        self.render_template('register.html', gift=gift)
+
+    def wait_for_result(self):
+        pass
+
+    def result(self):
+        pass
+
+    def maintenance(self):
+        pass
 
 
 def inc_counter(key):
@@ -259,6 +299,7 @@ class WelfareHandler(BaseHandler):
                   u'開放第一次抽獎結果',
                   u'開放第二次抽獎結果',
                   u'活動結束',
+                  u'維修',
                   )
 
         self.render_template('welfare.html', current=current, states=states)
@@ -304,7 +345,7 @@ class LoginApiHandler(BaseHandler):
             self.redirect_to(returnpath)
         elif returnpath:
             self.session.add_flash('unauthorized')
-            self.redirect_to('login', returnpath=returnpath)
+            self.redirect_to("login", returnpath=returnpath)
         else:
             self.redirect_to('home')
 
@@ -320,6 +361,39 @@ class AdminHandler(BaseHandler):
 
         self.session['ident'] = '0'
         self.render_template('admin.html')
+
+
+class GiftApiHandler(BaseHandler):
+    def post(self, action):
+        args = {'action': action}
+
+        if not self.auth:
+            args['result'] = 'unauthorized'
+        elif action == 'register':
+            gift = self.auth.give_set.get()
+            gift.description = self.request.get('desc')
+            gift.message = self.request.get('bless')
+            gift.put()
+
+            if not gift.is_complete:
+                args['result'] = 'more'
+                more = []
+                if not gift.description:
+                    more.append(u'禮物描述')
+                if not gift.message:
+                    more.append(u'祝福語')
+                if not gift.picture:
+                    more.append(u'照片')
+                args['more'] = u'、'.join(more)
+            else:
+                args['result'] = 'success'
+        elif action == 'upload':
+            pass
+        else:
+            args['result'] = 'unknown_action'
+
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(json.dumps(args))
 
 
 config = {}
@@ -338,4 +412,5 @@ application = webapp2.WSGIApplication([
         Route(r'/admin', handler=AdminHandler, name='admin'),
         Route(r'/api/user/<action:register|delete|reset>', handler=UserApiHandler, name='user-api'),
         Route(r'/api/login', handler=LoginApiHandler, name='login-api'),
+        Route(r'/api/gift/<action:register|upload>', handler=GiftApiHandler, name='gift-api'),
         ], config=config, debug=True)

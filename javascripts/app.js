@@ -173,6 +173,33 @@ $(document).ready(function () {
   });
 
 
+  /* register gift */
+  var giftRegistered = function(data, status) {
+    // message for log
+    var message;
+    if (data.result == 'success') {
+      message = '<div class="alert-box success">' +
+        '禮物登錄成功。' +
+        '</div>';
+    } else if (data.result == 'more') {
+      message = '<div class="alert-box warning">' +
+        '禮物登錄不完整，還缺：' + data.more + '。' +
+        '</div>';
+    } else {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '禮物登錄失敗。' +
+        '</div>';
+    }
+    $(message).prependTo('#log').fadeIn();
+  };
+  $('#gift').submit(function (e) {
+    e.preventDefault();
+
+    var action = $('#gift').attr('action');
+    $.post(action, $('#gift').serialize(), giftRegistered, 'json');
+  });
+
+
   /* TABS --------------------------------- */
   /* Remove if you don't need :) */
 
