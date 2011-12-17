@@ -200,6 +200,10 @@ $(document).ready(function () {
   });
 
 
+  /* lightbox effect for gift picture */
+  $('a.lightbox').lightBox();
+
+
   /* TABS --------------------------------- */
   /* Remove if you don't need :) */
 

@@ -32,7 +32,7 @@ STATE_EVENT_END = 4
 STATE_MAINTENANCE = 5
 
 MIN_FILE_SIZE = 1 # bytes
-MAX_FILE_SIZE = 5000000 # bytes
+MAX_FILE_SIZE = 1000000 # bytes
 ACCEPT_FILE_TYPES = re.compile('image/(gif|p?jpeg|(x-)?png)')
 THUMBNAIL_MODIFICATOR = '=s250' # max width / height
 
@@ -75,6 +75,11 @@ class Gift(db.Model):
     @property
     def is_complete(self):
         return self.description and self.message and self.picture
+
+    @property
+    def url(self):
+        if self.picture:
+            return images.get_serving_url(self.picture)
 
     @property
     def thumbnail_url(self):

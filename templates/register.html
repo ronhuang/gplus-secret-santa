@@ -21,14 +21,16 @@
             </form>
             <!-- show upload image -->
             <form id="upload" class="nice" action="/api/gift/upload" method="post" enctype="multipart/form-data">
-              <label for="upload-pic">禮物照片</label>
+              <label for="upload-pic">禮物照片 <span title="（支援 jpg、gif、png，大小不超過 1 MB。）">&#9754;</span></label>
               <input type="file" class="input-text" name="pic" id="upload-pic">
               <button type="submit" class="green nice button radius">上傳</button>
             </form>
           </div>
           <div class="six columns">
             {% if gift.picture %}
-            <img class="gift-thumbnail" src="{{ gift.thumbnail_url }}" alt="禮物照片" />
+            <a class="lightbox" href="{{ gift.url }}" title="{{ gift.description|e if gift.description }}">
+              <img class="gift-thumbnail" src="{{ gift.thumbnail_url }}" alt="禮物照片" />
+            </a>
             {% endif %}
           </div>
         </div>
@@ -37,6 +39,12 @@
           <div id="log" class="twelve columns">
             {% if args and args.result == 'success' %}
             <div class="alert-box success">禮物照片上傳成功。</div>
+            {% endif %}
+            {% if args and args.result == 'more' %}
+            <div class="alert-box warning">禮物登錄不完整，還缺：{{ args.more }}。</div>
+            {% endif %}
+            {% if args and args.result == 'invalid' %}
+            <div class="alert-box warning">禮物照片不正確。</div>
             {% endif %}
           </div>
         </div>
