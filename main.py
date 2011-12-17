@@ -75,6 +75,12 @@ class Log(db.Model):
     who = db.ReferenceProperty(User)
 
 
+class State(db.Model):
+    state = db.IntegerProperty(required=True, default=0)
+    created = db.DateTimeProperty(auto_now_add=True)
+    updated = db.DateTimeProperty(auto_now=True)
+
+
 class BaseHandler(webapp2.RequestHandler):
     @webapp2.cached_property
     def jinja2(self):
@@ -247,7 +253,15 @@ class WelfareHandler(BaseHandler):
         if self.auth.role >= ROLE_HELPER:
             return self.render_template('bad.html')
 
-        self.render_template('welfare.html')
+        current = State.get_or_insert('current').state
+        states = (u'開放登錄禮物',
+                  u'截止登錄禮物',
+                  u'開放第一次抽獎結果',
+                  u'開放第二次抽獎結果',
+                  u'活動結束',
+                  )
+
+        self.render_template('welfare.html', current=current, states=states)
 
 
 class AboutHandler(BaseHandler):
