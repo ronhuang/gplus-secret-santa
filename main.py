@@ -149,7 +149,7 @@ class HelperHandler(BaseHandler):
         if not self.auth:
             return self.redirect_to("login", returnpath="helper")
 
-        if self.auth.role >= ROLE_GOOD:
+        if self.auth.role > ROLE_HELPER:
             return self.render_template('bad.html')
 
         self.render_template('helper.html')
@@ -160,7 +160,7 @@ class GoodHandler(BaseHandler):
         if not self.auth:
             return self.redirect_to("login", returnpath="good")
 
-        if self.auth.role >= ROLE_GOOD:
+        if self.auth.role > ROLE_GOOD:
             return self.render_template('bad.html')
 
         current = State.get_or_insert('current').state
@@ -303,7 +303,7 @@ class WelfareHandler(BaseHandler):
         if not self.auth:
             return self.redirect_to("login", returnpath="welfare")
 
-        if self.auth.role >= ROLE_HELPER:
+        if self.auth.role > ROLE_WELFARE:
             return self.render_template('bad.html')
 
         current = State.get_or_insert('current').state
