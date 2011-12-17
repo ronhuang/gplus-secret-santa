@@ -5,19 +5,17 @@
 # See MIT-LICENSE.txt for details.
 
 
-import logging
-import webapp2
+from __future__ import with_statement
+
+import json, random, string, hashlib, logging, re, urllib, webapp2
+
+from google.appengine.api import images, files
+from google.appengine.ext import db, blobstore
+
 from webapp2 import Route
 from webapp2_extras import jinja2
 from webapp2_extras import sessions
-import os
-import time
-import datetime
-import json
-import random
-import string
-import hashlib
-from google.appengine.ext import db
+
 import prefs
 
 
@@ -32,6 +30,11 @@ STATE_GENERAL_RESULT = 2
 STATE_SPECIAL_RESULT = 3
 STATE_EVENT_END = 4
 STATE_MAINTENANCE = 5
+
+MIN_FILE_SIZE = 1 # bytes
+MAX_FILE_SIZE = 5000000 # bytes
+ACCEPT_FILE_TYPES = re.compile('image/(gif|p?jpeg|(x-)?png)')
+THUMBNAIL_MODIFICATOR = '=s250' # max width / height
 
 
 class User(db.Model):
@@ -65,13 +68,18 @@ class Gift(db.Model):
     updated = db.DateTimeProperty(auto_now=True)
     description = db.StringProperty()
     message = db.StringProperty()
-    picture = db.BlobProperty()
+    picture = blobstore.BlobReferenceProperty()
     giver = db.ReferenceProperty(User, collection_name='give_set', required=True)
     taker = db.ReferenceProperty(User, collection_name='take_set')
 
     @property
     def is_complete(self):
         return self.description and self.message and self.picture
+
+    @property
+    def thumbnail_url(self):
+        if self.picture:
+            return images.get_serving_url(self.picture) + THUMBNAIL_MODIFICATOR
 
 
 class Counter(db.Model):
@@ -169,8 +177,13 @@ class GoodHandler(BaseHandler):
 
     def register_gift(self):
         gift = self.auth.give_set.get()
+        args = None
 
-        self.render_template('register.html', gift=gift)
+        flashes = self.session.get_flashes()
+        for flash in flashes:
+            args = flash[0]
+
+        self.render_template('register.html', gift=gift, args=args)
 
     def wait_for_result(self):
         pass
@@ -364,6 +377,58 @@ class AdminHandler(BaseHandler):
 
 
 class GiftApiHandler(BaseHandler):
+    def validate(self, info):
+        if info['size'] < MIN_FILE_SIZE:
+            info['error'] = 'minFileSize'
+        elif info['size'] > MAX_FILE_SIZE:
+            info['error'] = 'maxFileSize'
+        elif not ACCEPT_FILE_TYPES.match(info['type']):
+            info['error'] = 'acceptFileTypes'
+        else:
+            return True
+        return False
+
+    def get_file_size(self, handle):
+        handle.seek(0, 2) # Seek to the end of the file
+        size = handle.tell() # Get the position of EOF
+        handle.seek(0) # Reset the file position to the beginning
+        return size
+
+    def write_blob(self, data, info):
+        blob = files.blobstore.create(
+            mime_type=info['type'],
+            _blobinfo_uploaded_filename=info['name']
+        )
+        with files.open(blob, 'a') as f:
+            f.write(data)
+        files.finalize(blob)
+        return files.blobstore.get_blob_key(blob)
+
+    def handle_upload(self, args):
+        pic = None
+        for name, field in self.request.POST.items():
+            pic = field
+            break
+
+        blob_key = None
+        info = {
+            'name': re.sub(r'^.*\\', '', pic.filename),
+            'type': pic.type,
+            'size': self.get_file_size(pic.file),
+            }
+
+        if self.validate(info):
+            blob_key = self.write_blob(pic.value, info)
+            try:
+                url = images.get_serving_url(blob_key)
+            except: # Could not get an image serving url
+                args['result'] = 'invalid'
+                blob_key = None
+        else:
+            args['result'] = 'invalid'
+
+        return blob_key, args
+
     def post(self, action):
         args = {'action': action}
 
@@ -388,7 +453,38 @@ class GiftApiHandler(BaseHandler):
             else:
                 args['result'] = 'success'
         elif action == 'upload':
-            pass
+            blob_key, args = self.handle_upload(args)
+
+            if not blob_key:
+                # image uploaded unsuccesfully
+                self.session.add_flash(args)
+                return self.redirect_to("good")
+
+            # image uploaded succesfully
+            gift = self.auth.give_set.get()
+            old_blob = gift.picture
+            blob = blobstore.get(blob_key)
+            gift.picture = blob
+            gift.put()
+
+            if old_blob:
+                old_blob.delete()
+
+            if not gift.is_complete:
+                args['result'] = 'more'
+                more = []
+                if not gift.description:
+                    more.append(u'禮物描述')
+                if not gift.message:
+                    more.append(u'祝福語')
+                if not gift.picture:
+                    more.append(u'照片')
+                args['more'] = u'、'.join(more)
+            else:
+                args['result'] = 'success'
+
+            self.session.add_flash(args)
+            return self.redirect_to("good")
         else:
             args['result'] = 'unknown_action'
 
