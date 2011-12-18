@@ -22,7 +22,7 @@ a, a:hover, a:visited {
 
 #topbar {
   background: green;
-  border-bottom: solid 4px #C60000;
+  border-bottom: solid 4px #CC0000;
   padding: 15px 20px 13px;
 }
 
@@ -73,6 +73,17 @@ a, a:hover, a:visited {
   margin-top: 20px;
   padding-top: 20px;
   border-top: solid 1px green;
+}
+
+#main h3 {
+  margin-top: 10px;
+}
+
+#sidebar {
+  min-height: 600px !important;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
 }
 
 /* -----------------------------------------
@@ -138,16 +149,15 @@ p.gifts {
 /* -----------------------------------------
    Helper page
 ----------------------------------------- */
-#main h3 {
-  margin-top: 10px;
+.welfare #sidebar {
+  background-image: url(/images/welfare-bg.jpg);
 }
 
-#sidebar {
-  min-height: 600px !important;
+/* -----------------------------------------
+   Helper page
+----------------------------------------- */
+.helper #sidebar {
   background-image: url(/images/helper-bg.jpg);
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
 }
 
 /* -----------------------------------------
@@ -171,16 +181,6 @@ img.question {
 
 .gift-complete.hidden, .gift-incomplete.hidden {
   display: none;
-}
-
-/* -----------------------------------------
-   About page
------------------------------------------ */
-#about {
-  min-height: 418px !important;
-  background-image: url(/images/about.jpg);
-  background-repeat: no-repeat;
-  background-position: center center;
 }
 
 /* -----------------------------------------
