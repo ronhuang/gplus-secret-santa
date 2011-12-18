@@ -13,7 +13,7 @@
         <div class="row">
           <div class="twelve columns">
             <p>禮物編號：{{ gift.ident }}</p>
-            <p>抽大獎的資格：{{ '有' if gift.is_complete else '否' }}</p>
+            <p>抽大獎的資格：{% if gift.is_complete %}&#10004;{% else %}<span title="資料不完全">&#10006</span>{% endif %}</p>
             <p>禮物描述：{{ gift.description|e if gift.description }}</p>
             <p>給對方的祝福語：{{ gift.message|e if gift.message }}</p>
           </div>
