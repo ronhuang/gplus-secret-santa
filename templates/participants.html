@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block base_title %}參與人員 - {{ super() }}{% endblock %}
+
+{% block base_content %}
+  <div class="container">
+    <div class="row">
+      <div class="twelve columns">
+        <h3>參與人員</h3>
+        <h4 class="subheader">目前共有 {{ count }} 人參與活動</h4>
+        <hr>
+        <table id="participants" class="tablesorter">
+          <thead>
+            <tr>
+              <th></th>
+              <th>工號</th>
+              <th>權限</th>
+              <th>主管</th>
+              <th>登錄時間</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ user.ident }}</td>
+              {% if user.role == 1000 %}
+              <td>福委</td>
+              {% elif user.role == 2000 %}
+              <td>小麋鹿</td>
+              {% elif user.role == 3000 %}
+              <td>乖小孩子</td>
+              {% else %}
+              <td>{{ user.role }}</td>
+              {% endif %}
+              <td>{{ '是' if user.executive }}</td>
+              <td>{{ user.created }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}

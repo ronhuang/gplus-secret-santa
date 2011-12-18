@@ -265,6 +265,10 @@ $(document).ready(function () {
   }
 
 
+  /* participants table */
+  $('#participants').tablesorter();
+
+
   /* PLACEHOLDER FOR FORMS ------------- */
   /* Remove this and jquery.placeholder.min.js if you don't need :) */
 
