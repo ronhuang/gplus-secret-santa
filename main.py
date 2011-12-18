@@ -7,7 +7,7 @@
 
 from __future__ import with_statement
 
-import json, random, string, hashlib, logging, re, urllib, webapp2
+import json, random, string, hashlib, logging, re, urllib, itertools, webapp2
 
 from google.appengine.api import images, files
 from google.appengine.ext import db, blobstore, deferred
@@ -405,8 +405,17 @@ def assign_taker(gift_key, taker_key, auth_key):
 
 
 class DrawApiHandler(BaseHandler):
+    def valid(self, a, b):
+        # make sure no one gets their own gift
+        for i, j in itertools.izip(a, b):
+            if i == j:
+                return False
+        return True
+
     def shuffle(self, items):
-        return items
+        orig = list(items)
+        while not self.valid(orig, items):
+            random.shuffle(items)
 
     def draw(self):
         gifts = db.GqlQuery("SELECT * FROM Gift")
