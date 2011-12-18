@@ -33,6 +33,18 @@
         </div>
         <hr>
         <div class="row">
+          <div class="six columns">
+            <h4>重置密碼</h4>
+            <form id="reset" class="nice" action="/api/user/reset" method="post">
+              <label for="reset-ident">工號</label>
+              <input type="text" placeholder="00289" class="small input-text"
+                     name="ident" id="reset-ident" maxlength="5">
+              <button type="submit" class="small green nice button radius">重置</button>
+            </form>
+          </div>
+        </div>
+        <hr>
+        <div class="row">
           <div id="log" class="twelve columns">
           </div>
         </div>
@@ -52,5 +64,11 @@
 	<p>移除之後就不能回復！</p>
     <a class="close-reveal-modal">×</a>
     <button class="nice red radius button delete">移除</button>
+  </div>
+
+  <div id="reset-dialog" class="reveal-modal">
+	<h2>工號 <span class="ident"></span> 密碼重置成功</h2>
+	<p class="lead">密碼：<span class="passwd"></span>。</p>
+    <a class="close-reveal-modal">×</a>
   </div>
 {% endblock %}

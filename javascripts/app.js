@@ -135,6 +135,10 @@ $(document).ready(function () {
       message = '<div class="alert-box error" style="display: none;">' +
         '工號 ' + data.ident + ' 不正確。' +
         '</div>';
+    } else if (data.result == 'unauthorized') {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '權限不足。' +
+        '</div>';
     } else {
       message = '<div class="alert-box error" style="display: none;">' +
         '工號 ' + data.ident + ' 密碼重置失敗。' +
