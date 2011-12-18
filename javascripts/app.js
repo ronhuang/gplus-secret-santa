@@ -71,7 +71,7 @@ $(document).ready(function () {
     // message for log
     var message;
     if (data.result == 'success') {
-      message = '<div class="alert-box success">' +
+      message = '<div class="alert-box success" style="display: none;">' +
         '工號 ' + data.ident + ' 已被移除。' +
         '</div>';
     } else if (data.result == 'nonexist') {
@@ -178,13 +178,13 @@ $(document).ready(function () {
     // message for log
     var message;
     if (data.result == 'success') {
-      message = '<div class="alert-box success">' +
+      message = '<div class="alert-box success" style="display: none;">' +
         '禮物登錄成功。' +
         '</div>';
       $('.gift-complete').removeClass('hidden');
       $('.gift-incomplete').addClass('hidden');
     } else if (data.result == 'more') {
-      message = '<div class="alert-box warning">' +
+      message = '<div class="alert-box warning" style="display: none;">' +
         '禮物登錄不完整，還缺：' + data.more + '。' +
         '</div>';
       $('.gift-complete').addClass('hidden');
@@ -206,6 +206,30 @@ $(document).ready(function () {
 
   /* lightbox effect for gift picture */
   $('a.lightbox').lightBox();
+
+
+  /* change state */
+  var stateChanged = function(data, status) {
+    // message for log
+    var message;
+    if (data.result == 'success') {
+      message = '<div class="alert-box success" style="display: none;">' +
+        '抽獎階段切換成功。' +
+        '</div>';
+      $('.change-state').text(data.state_label);
+    } else {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '抽獎階段切換失敗。' +
+        '</div>';
+    }
+    $(message).prependTo('#log').fadeIn();
+  };
+  $('#change').submit(function (e) {
+    e.preventDefault();
+
+    var action = $('#change').attr('action');
+    $.post(action, $('#change').serialize(), stateChanged, 'json');
+  });
 
 
   /* TABS --------------------------------- */

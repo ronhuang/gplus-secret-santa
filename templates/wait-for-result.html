@@ -1,0 +1,31 @@
+{% extends "sidebar.html" %}
+
+{% block title %}登錄禮物已截止{% endblock %}
+
+{% block subtitle %}登錄禮物已截止{% endblock %}
+
+{% block subheader %}福委正在整理禮物，完成之後就會開放抽獎{% endblock %}
+
+{% block class %}good{% endblock %}
+
+{% block content %}
+        <h4>您所登錄的禮物</h4>
+        <div class="row">
+          <div class="twelve columns">
+            <p>禮物編號：{{ gift.ident }}</p>
+            <p>抽大獎的資格：{{ '有' if gift.is_complete else '否' }}</p>
+            <p>禮物描述：{{ gift.description|e if gift.description }}</p>
+            <p>給對方的祝福語：{{ gift.message|e if gift.message }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="six columns">
+            <p>禮物照片：</p>
+            {% if gift.picture %}
+            <a class="lightbox" href="{{ gift.url }}" title="{{ gift.description|e if gift.description }}">
+              <img class="gift-thumbnail" src="{{ gift.thumbnail_url }}" alt="禮物照片" />
+            </a>
+            {% endif %}
+          </div>
+        </div>
+{% endblock %}

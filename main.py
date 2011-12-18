@@ -31,6 +31,20 @@ STATE_SPECIAL_RESULT = 3
 STATE_EVENT_END = 4
 STATE_MAINTENANCE = 5
 
+STATES = (STATE_REGISTER_START,
+          STATE_REGISTER_END,
+          STATE_GENERAL_RESULT,
+          STATE_SPECIAL_RESULT,
+          STATE_EVENT_END,
+          STATE_MAINTENANCE)
+
+STATE_LABELS = (u'開放登錄禮物',
+                u'截止登錄禮物',
+                u'開放第一次抽獎結果',
+                u'開放第二次抽獎結果',
+                u'活動結束',
+                u'維修')
+
 MIN_FILE_SIZE = 1 # bytes
 MAX_FILE_SIZE = 1000000 # bytes
 ACCEPT_FILE_TYPES = re.compile('image/(gif|p?jpeg|(x-)?png)')
@@ -197,7 +211,8 @@ class GoodHandler(BaseHandler):
         self.render_template('register.html', gift=gift, args=args)
 
     def wait_for_result(self):
-        pass
+        gift = self.auth.give_set.get()
+        self.render_template('wait-for-result.html', gift=gift)
 
     def result(self):
         pass
@@ -318,15 +333,7 @@ class WelfareHandler(BaseHandler):
             return self.render_template('bad.html')
 
         current = State.get_or_insert('current').state
-        states = (u'開放登錄禮物',
-                  u'截止登錄禮物',
-                  u'開放第一次抽獎結果',
-                  u'開放第二次抽獎結果',
-                  u'活動結束',
-                  u'維修',
-                  )
-
-        self.render_template('welfare.html', current=current, states=states)
+        self.render_template('welfare.html', current=current, states=STATE_LABELS)
 
 
 class AboutHandler(BaseHandler):
@@ -503,6 +510,35 @@ class GiftApiHandler(BaseHandler):
         self.response.write(json.dumps(args))
 
 
+class StateApiHandler(BaseHandler):
+    def post(self, action):
+        args = {'action': action}
+
+        if not self.auth or self.auth.role > ROLE_WELFARE:
+            args['result'] = 'unauthorized'
+        elif action == 'change':
+            state = int(self.request.get('state'))
+            args['state'] = state
+
+            if state in STATES:
+                current = State.get_or_insert('current')
+                old_state = current.state
+                current.state = state
+                current.put()
+
+                self.add_log("state changed from %d to %d." % (old_state, state))
+
+                args['result'] = 'success'
+                args['state_label'] = STATE_LABELS[state]
+            else:
+                args['result'] = 'invalid_state'
+        else:
+            args['result'] = 'unknown_action'
+
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(json.dumps(args))
+
+
 config = {}
 config['webapp2_extras.sessions'] = {
     'secret_key': prefs.SESSIONS_SECRET_KEY,
@@ -520,4 +556,5 @@ application = webapp2.WSGIApplication([
         Route(r'/api/user/<action:register|delete|reset>', handler=UserApiHandler, name='user-api'),
         Route(r'/api/login', handler=LoginApiHandler, name='login-api'),
         Route(r'/api/gift/<action:register|upload>', handler=GiftApiHandler, name='gift-api'),
+        Route(r'/api/state/<action:change>', handler=StateApiHandler, name='state-api'),
         ], config=config, debug=True)

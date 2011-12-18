@@ -42,7 +42,7 @@
           <div class="six columns">
             <h4>變更抽獎階段</h4>
             <form id="change" class="nice" action="/api/state/change" method="post">
-              <label>目前階段：{{ states[current] }}</label>
+              <label>目前階段：<span class="change-state">{{ states[current] }}</span></label>
               <select name="state">
                 {% for state in states %}
                 <option value="{{ loop.index0 }}" {{ "selected" if current == loop.index0 }}>{{ states[loop.index0] }}</option>
