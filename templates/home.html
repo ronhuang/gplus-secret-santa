@@ -9,8 +9,8 @@
         <h2>記得故事書裡的主角，很期待耶誕節當天看到耶誕樹下放滿禮物，透過這個活動，將延續這種感動。</h2>
         <a id="mainEntry" href="good" class="nice green button">乖小孩子從這邊進入</a>
         <p>
-          <a href="helper">小麋鹿專區 »</a>
-          <a href="welfare">福委專區 »</a>
+          <a class="darker" href="helper">小麋鹿專區 »</a>
+          <a class="darker" href="welfare">福委專區 »</a>
         </p>
       </header>
     </div>
@@ -25,6 +25,13 @@
           <span class="orbit-caption" id="gift-{{ loop.index }}">#{{ gift.ident }} {{ gift.message|e }}</span>
           {% endfor %}
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="five columns centered">
+        <p class="gifts">
+          <a class="darker" href="gifts">更多禮物 »</a>
+        </p>
       </div>
     </div>
     {% endif %}

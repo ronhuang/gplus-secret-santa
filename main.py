@@ -100,6 +100,11 @@ class Gift(db.Model):
             return images.get_serving_url(self.picture, 250, False)
 
     @property
+    def grid_url(self):
+        if self.picture:
+            return images.get_serving_url(self.picture, 150, True)
+
+    @property
     def orbit_url(self):
         if self.picture:
             return images.get_serving_url(self.picture, 383, True)
@@ -165,8 +170,13 @@ class BaseHandler(webapp2.RequestHandler):
 class HomeHandler(BaseHandler):
     def get(self):
         query = db.GqlQuery("SELECT * FROM Gift WHERE picture != NULL ORDER BY picture DESC, updated DESC LIMIT 10")
-
         self.render_template('home.html', query=query, count=query.count())
+
+
+class GiftsHandler(BaseHandler):
+    def get(self):
+        query = db.GqlQuery("SELECT * FROM Gift ORDER BY created")
+        self.render_template('gifts.html', gifts=query, count=query.count())
 
 
 class HelperHandler(BaseHandler):
@@ -547,6 +557,7 @@ config['webapp2_extras.sessions'] = {
 
 application = webapp2.WSGIApplication([
         Route(r'/', handler=HomeHandler, name='home'),
+        Route(r'/gifts', handler=GiftsHandler, name='gifts'),
         Route(r'/helper', handler=HelperHandler, name='helper'),
         Route(r'/good', handler=GoodHandler, name='good'),
         Route(r'/welfare', handler=WelfareHandler, name='welfare'),
