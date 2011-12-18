@@ -145,6 +145,14 @@ header p a {
   background-image: url(/images/good-bg.jpg);
 }
 
+label.question {
+  display: inline;
+}
+
+img.question {
+  vertical-align: text-top;
+}
+
 .gift-complete.hidden, .gift-incomplete.hidden {
   display: none;
 }

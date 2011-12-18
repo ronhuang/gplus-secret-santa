@@ -23,7 +23,8 @@
             </form>
             <!-- show upload image -->
             <form id="upload" class="nice" action="/api/gift/upload" method="post" enctype="multipart/form-data">
-              <label for="upload-pic">禮物照片 <span title="（支援 jpg、gif、png，大小不超過 1 MB。）">&#9754;</span></label>
+              <label class="question" for="upload-pic">禮物照片</label>
+              <img class="question" src="images/question.gif" title="（支援 jpg、gif、png，大小不超過 1 MB。）" />
               <input type="file" class="input-text" name="pic" id="upload-pic">
               <button type="submit" class="green nice button radius">上傳</button>
             </form>
