@@ -43,12 +43,15 @@
         <h1><a href="/">耶誕交換禮物網站</a></h1>
       </div>
       <div class="eight columns hide-on-phones">
-      	<strong class="right">
-      	  <a href="/good">乖小孩子</a>
-      	  <a href="/helper">小麋鹿專區</a>
-      	  <a href="/welfare">福委專區</a>
-      	  <a href="/about">關於活動</a>
-      	</strong>
+        <strong class="right">
+          <a href="/good">乖小孩子</a>
+          <a href="/helper">小麋鹿專區</a>
+          <a href="/welfare">福委專區</a>
+          <a href="/about">關於活動</a>
+          {% if auth %}
+          <a class="nice small radius white button logout" href="/logout">登出</a>
+          {% endif %}
+        </strong>
       </div>
     </div>
   </div>

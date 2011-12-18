@@ -133,6 +133,11 @@ class BaseHandler(webapp2.RequestHandler):
         return jinja2.get_jinja2(app=self.app)
 
     def render_template(self, filename, **template_args):
+        if not template_args:
+            template_args = {}
+        if not 'auth' in template_args:
+            template_args['auth'] = self.auth
+
         body = self.jinja2.render_template(filename, **template_args)
         self.response.write(body)
 
