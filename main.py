@@ -356,16 +356,17 @@ class AboutHandler(BaseHandler):
         self.render_template('about.html')
 
 
-class ParticipantsHandler(BaseHandler):
+class StatsHandler(BaseHandler):
     def get(self):
         if not self.auth:
-            return self.redirect_to("login", returnpath="participants")
+            return self.redirect_to("login", returnpath="stats")
 
         if self.auth.role > ROLE_WELFARE:
             return self.render_template('bad.html')
 
-        query = db.GqlQuery("SELECT * FROM User ORDER BY created")
-        self.render_template('participants.html', users=query, count=query.count())
+        users = db.GqlQuery("SELECT * FROM User WHERE ident != :1", "0")
+        gifts = db.GqlQuery("SELECT * FROM Gift")
+        self.render_template('stats.html', users=users, gifts=gifts)
 
 
 class LoginHandler(BaseHandler):
@@ -579,7 +580,7 @@ application = webapp2.WSGIApplication([
         Route(r'/good', handler=GoodHandler, name='good'),
         Route(r'/welfare', handler=WelfareHandler, name='welfare'),
         Route(r'/about', handler=AboutHandler, name='about'),
-        Route(r'/participants', handler=ParticipantsHandler, name='participants'),
+        Route(r'/stats', handler=StatsHandler, name='stats'),
         Route(r'/login', handler=LoginHandler, name='login'),
         Route(r'/logout', handler=LogoutHandler, name='logout'),
         Route(r'/admin', handler=AdminHandler, name='admin'),

@@ -265,8 +265,13 @@ $(document).ready(function () {
   }
 
 
-  /* participants table */
-  $('#participants').tablesorter();
+  /* stats table */
+  $('#participants').tablesorter({
+    sortList: [[3, 0]]
+  });
+  $('#gifts').tablesorter({
+    sortList: [[4, 0]]
+  });
 
 
   /* PLACEHOLDER FOR FORMS ------------- */

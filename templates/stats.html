@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block base_title %}資料統計 - {{ super() }}{% endblock %}
+
+{% block base_content %}
+  <div class="container">
+    <div class="row">
+      <div class="twelve columns">
+        <h3>資料統計</h3>
+        <h4 class="subheader">目前共有 {{ users.count() }} 人參與活動，收到 {{ gifts.count() }} 份禮物</h4>
+        <hr>
+      </div>
+    </div>
+    <div class="row">
+      <div class="six columns">
+        <h5>參與人員</h5>
+        <table id="participants" class="tablesorter">
+          <thead>
+            <tr>
+              <th>工號</th>
+              <th>權限</th>
+              <th>主管</th>
+              <th>登錄時間</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>{{ user.ident }}</td>
+              {% if user.role == 1000 %}
+              <td>福委</td>
+              {% elif user.role == 2000 %}
+              <td>小麋鹿</td>
+              {% elif user.role == 3000 %}
+              <td>乖小孩子</td>
+              {% else %}
+              <td>{{ user.role }}</td>
+              {% endif %}
+              <td>{% if user.executive %}&#10004;{% endif %}</td>
+              <td>{{ user.created }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="six columns">
+        <h5>收到禮物</h5>
+        <table id="gifts" class="tablesorter">
+          <thead>
+            <tr>
+              <th>編號</th>
+              <th>完成登錄</th>
+              <th>提供者</th>
+              <th>收禮者</th>
+              <th>登錄時間</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for gift in gifts %}
+            <tr>
+              <td>{{ gift.ident }}</td>
+              <td>{% if gift.is_complete %}&#10004;{% endif %}</td>
+              <td>{{ gift.giver.ident }}</td>
+              <td>{{ gift.taker.ident if gift.taker }}</td>
+              <td>{{ gift.created }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
