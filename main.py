@@ -332,6 +332,29 @@ class UserApiHandler(BaseHandler):
                     args['result'] = 'success'
             else:
                 args['result'] = 'invalid_ident'
+        elif action == 'update':
+            ident = self.request.get('ident')
+            args['ident'] = ident
+            role = int(self.request.get('role'))
+
+            if ident and len(ident) == 5:
+                query = db.GqlQuery("SELECT * FROM User WHERE ident = :1", ident)
+                user = query.get()
+
+                if not user:
+                    args['result'] = 'nonexist'
+                elif self.auth.role >= user.role:
+                    # lower role has greater permission
+                    args['result'] = 'unauthorized'
+                else:
+                    old_role = user.role
+                    user.role = role
+                    user.put()
+
+                    self.add_log("user '%s' role changed from %d to %d." % (user.ident, old_role, user.role))
+                    args['result'] = 'success'
+            else:
+                args['result'] = 'invalid_ident'
         else:
             args['result'] = 'unknown_action'
 
@@ -412,14 +435,15 @@ class LoginApiHandler(BaseHandler):
 class AdminHandler(BaseHandler):
     def get(self):
         # add admin is not already exist
-        query = db.GqlQuery("SELECT * FROM User WHERE ident = 0")
+        query = db.GqlQuery("SELECT * FROM User WHERE ident = :1", "0")
         user = query.get()
         if not user:
             user = User(ident='0', role=ROLE_ADMIN)
             user.put()
 
         self.session['ident'] = '0'
-        self.render_template('admin.html')
+        users = db.GqlQuery("SELECT * FROM User WHERE ident != :1 ORDER BY ident", "0")
+        self.render_template('admin.html', users=users)
 
 
 class GiftApiHandler(BaseHandler):
@@ -584,7 +608,7 @@ application = webapp2.WSGIApplication([
         Route(r'/login', handler=LoginHandler, name='login'),
         Route(r'/logout', handler=LogoutHandler, name='logout'),
         Route(r'/admin', handler=AdminHandler, name='admin'),
-        Route(r'/api/user/<action:register|delete|reset>', handler=UserApiHandler, name='user-api'),
+        Route(r'/api/user/<action:register|delete|reset|update>', handler=UserApiHandler, name='user-api'),
         Route(r'/api/login', handler=LoginApiHandler, name='login-api'),
         Route(r'/api/gift/<action:register|upload>', handler=GiftApiHandler, name='gift-api'),
         Route(r'/api/state/<action:change>', handler=StateApiHandler, name='state-api'),

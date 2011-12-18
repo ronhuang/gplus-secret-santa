@@ -177,6 +177,52 @@ $(document).ready(function () {
   });
 
 
+  /* update user */
+  var userUpdated = function(data, status) {
+    // message for log
+    var message;
+    if (data.result == 'success') {
+      message = '<div class="alert-box success" style="display: none;">' +
+        '工號 ' + data.ident + ' 權限變更成功。' +
+        '</div>';
+    } else if (data.result == 'nonexist') {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '工號 ' + data.ident + ' 不存在。' +
+        '</div>';
+    } else if (data.result == 'invalid_ident') {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '工號 ' + data.ident + ' 不正確。' +
+        '</div>';
+    } else if (data.result == 'unauthorized') {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '權限不足。' +
+        '</div>';
+    } else {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '工號 ' + data.ident + ' 權限變更失敗。' +
+        '</div>';
+    }
+    $(message).prependTo('#log').fadeIn();
+  };
+  $('#update').submit(function (e) {
+    e.preventDefault();
+
+    var field = $('#update select[name=ident]');
+
+    var length = field.val().length;
+    if (length != 5) {
+      var message = '<div class="alert-box error" style="display: none;">' +
+        '工號要有五個字元。' +
+        '</div>';
+      $(message).prependTo('#log').fadeIn();
+      return;
+    }
+
+    var action = $('#update').attr('action');
+    $.post(action, $('#update').serialize(), userUpdated, 'json');
+  });
+
+
   /* register gift */
   var giftRegistered = function(data, status) {
     // message for log

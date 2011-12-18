@@ -28,6 +28,24 @@
         </div>
         <hr>
         <div class="row">
+          <div class="six columns">
+            <h4>變更權限</h4>
+            <form id="update" class="nice" action="/api/user/update" method="post">
+              <label>工號</label>
+              <select name="ident">
+                {% for user in users %}
+                <option value="{{ user.ident }}">{{ user.ident }} ({{ user.role }})</option>
+                {% endfor %}
+              </select>
+              <label for="update-welfare"><input name="role" type="radio" id="update-welfare" value="1000"> 福委 (1000)</label>
+              <label for="update-helper"><input name="role" type="radio" id="update-helper" value="2000"> 小麋鹿 (2000)</label>
+              <label for="update-good"><input name="role" type="radio" id="update-good" value="3000"> 乖小孩子 (3000)</label>
+              <button type="submit" class="small green nice button radius">變更</button>
+            </form>
+          </div>
+        </div>
+        <hr>
+        <div class="row">
           <div id="log" class="twelve columns">
           </div>
         </div>
