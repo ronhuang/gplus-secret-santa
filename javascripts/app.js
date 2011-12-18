@@ -340,6 +340,31 @@ $(document).ready(function () {
   });
 
 
+  /* fetch result */
+  var resultFetched = function(data, status) {
+    $('.subtitle, .subheader, .subdivider, #before').fadeOut('slow', function() {
+      $('.subtitle').text('恭喜您').fadeIn('slow', function() {
+        $('.subheader').text('您抽到...').fadeIn('slow', function() {
+          $('.subdivider').fadeIn('slow', function() {
+            $('#after').fadeIn('slow', function() {
+              $('#after-image').fadeIn('slow', function() {
+                $('#after-gift').fadeIn('slow', function() {
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  };
+  $('#fetch').click(function(e) {
+    e.preventDefault();
+
+    var action = $('#fetch').attr('href');
+    $.post(action, null, resultFetched, 'json');
+  });
+
+
   /* TABS --------------------------------- */
   /* Remove if you don't need :) */
 

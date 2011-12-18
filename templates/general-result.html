@@ -1,0 +1,36 @@
+{% extends "sidebar.html" %}
+
+{% block title %}{% if not user.checkedFirstDraw %}抽獎{% else %}恭喜您{% endif %}{% endblock %}
+
+{% block subtitle %}{% if not user.checkedFirstDraw %}抽獎{% else %}恭喜您{% endif %}{% endblock %}
+
+{% block subheader %}{% if not user.checkedFirstDraw %}您準備好了嗎？請按下面的鈕抽獎{% else %}您抽到...{% endif %}{% endblock %}
+
+{% block class %}good{% endblock %}
+
+{% block content %}
+        {% if not user.checkedFirstDraw %}
+        <div id="before" class="row">
+          <div class="twelve columns">
+            <a id="fetch" class="large green nice button radius" href="/api/result/fetch">抽獎</a>
+            <div id="fetch-result"></div>
+          </div>
+        </div>
+        {% endif %}
+        <div id="after" class="row" {% if not user.checkedFirstDraw %}style="display: none;"{% endif %}>
+          <div class="twelve columns">
+            <div id="after-image" {% if not user.checkedFirstDraw %}style="display: none;"{% endif %}>
+              {% if gift.url %}
+              <img src="{{ gift.url }}" alt="禮物照片" title="{{ gift.description|e if gift.description }}"/>
+              {% else %}
+              <img src="images/cell.jpg" />
+              {% endif %}
+            </div>
+            <div id="after-gift" {% if not user.checkedFirstDraw %}style="display: none;"{% endif %}>
+              <p>編號：{{ gift.ident }}</p>
+              <p>描述：{{ gift.description|e if gift.description }}</p>
+              <p>祝福語：{{ gift.message|e if gift.message }}</p>
+            </div>
+          </div>
+        </div>
+{% endblock %}

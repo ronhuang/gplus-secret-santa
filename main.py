@@ -208,8 +208,12 @@ class GoodHandler(BaseHandler):
             self.register_gift()
         elif current == STATE_REGISTER_END:
             self.wait_for_result()
-        elif current == STATE_GENERAL_RESULT or current == STATE_SPECIAL_RESULT or current == STATE_EVENT_END:
-            self.result()
+        elif current == STATE_GENERAL_RESULT:
+            self.general_result()
+        elif current == STATE_SPECIAL_RESULT:
+            self.special_result()
+        elif current == STATE_EVENT_END:
+            self.event_end()
         elif current == STATE_MAINTENANCE:
             self.maintenance()
         else:
@@ -229,7 +233,15 @@ class GoodHandler(BaseHandler):
         gift = self.auth.give_set.get()
         self.render_template('wait-for-result.html', gift=gift)
 
-    def result(self):
+    def general_result(self):
+        gift = self.auth.take_set.get()
+        user = self.auth
+        self.render_template('general-result.html', gift=gift, user=user)
+
+    def special_result(self):
+        pass
+
+    def event_end(self):
         pass
 
     def maintenance(self):
@@ -675,6 +687,27 @@ class StateApiHandler(BaseHandler):
         self.response.write(json.dumps(args))
 
 
+class ResultApiHandler(BaseHandler):
+    def post(self, action):
+        args = {'action': action}
+
+        if not self.auth:
+            args['result'] = 'unauthorized'
+        elif action == 'fetch':
+            user = self.auth
+            user.checkedFirstDraw = True
+            user.put()
+
+            self.add_log("user %s fetched first result." % (user.ident))
+
+            args['result'] = 'success'
+        else:
+            args['result'] = 'unknown_action'
+
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(json.dumps(args))
+
+
 config = {}
 config['webapp2_extras.sessions'] = {
     'secret_key': prefs.SESSIONS_SECRET_KEY,
@@ -696,4 +729,5 @@ application = webapp2.WSGIApplication([
         Route(r'/api/login', handler=LoginApiHandler, name='login-api'),
         Route(r'/api/gift/<action:register|upload>', handler=GiftApiHandler, name='gift-api'),
         Route(r'/api/state/<action:change>', handler=StateApiHandler, name='state-api'),
+        Route(r'/api/result/<action:fetch>', handler=ResultApiHandler, name='result-api'),
         ], config=config, debug=True)
