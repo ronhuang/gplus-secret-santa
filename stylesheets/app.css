@@ -145,6 +145,10 @@ header p a {
   background-image: url(/images/good-bg.jpg);
 }
 
+.gift-complete.hidden, .gift-incomplete.hidden {
+  display: none;
+}
+
 /* -----------------------------------------
    About page
 ----------------------------------------- */

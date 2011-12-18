@@ -9,7 +9,7 @@
 {% block class %}good{% endblock %}
 
 {% block content %}
-        <h4>登錄禮物 <span title="{{ '已完成' if gift.is_complete else '尚未完成' }}">{{ '&#10004;'|safe if gift.is_complete else '&#10006;'|safe }}</span></h4>
+        <h4>登錄禮物 <span class="gift-complete {{ 'hidden' if not gift.is_complete }}" title="已完成">&#10004;</span><span class="gift-incomplete {{ 'hidden' if gift.is_complete }}" title="未完成">&#10006;</span></h4>
         <div class="row">
           <div class="six columns">
             <form id="gift" class="nice" action="/api/gift/register" method="post">

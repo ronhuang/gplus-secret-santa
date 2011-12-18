@@ -181,10 +181,14 @@ $(document).ready(function () {
       message = '<div class="alert-box success">' +
         '禮物登錄成功。' +
         '</div>';
+      $('.gift-complete').removeClass('hidden');
+      $('.gift-incomplete').addClass('hidden');
     } else if (data.result == 'more') {
       message = '<div class="alert-box warning">' +
         '禮物登錄不完整，還缺：' + data.more + '。' +
         '</div>';
+      $('.gift-complete').addClass('hidden');
+      $('.gift-incomplete').removeClass('hidden');
     } else {
       message = '<div class="alert-box error" style="display: none;">' +
         '禮物登錄失敗。' +
