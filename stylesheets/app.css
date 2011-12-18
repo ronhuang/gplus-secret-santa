@@ -17,7 +17,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a, a:hover, a:visited {
-  color: gold;
+  color: darkGreen;
 }
 
 #topbar {
@@ -36,6 +36,10 @@ a, a:hover, a:visited {
   font-size: 16px;
   font-size: 1.6rem;
   font-weight: 800;
+}
+
+#topbar a, #topbar a:hover, #topbar a:visited {
+  color: gold;
 }
 
 #topbar h1 a {
@@ -59,6 +63,10 @@ a, a:hover, a:visited {
 
 #topbar .logout {
   padding: 2px 10px;
+}
+
+#topbar a.logout, #topbar a.logout:hover, #topbar a.logout:visited {
+  color: darkGreen;
 }
 
 #footer {
@@ -125,10 +133,6 @@ header p a {
 
 p.gifts {
   text-align: center;
-}
-
-a.darker {
-  color: darkGreen;
 }
 
 /* -----------------------------------------
