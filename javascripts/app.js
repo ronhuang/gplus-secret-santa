@@ -333,8 +333,10 @@ $(document).ready(function () {
   $('#draw').click(function(e) {
     e.preventDefault();
 
-    // show confirmation dialog
-    $('#draw-dialog').reveal();
+    if (!$('#draw').hasClass('disabled')) {
+      // show confirmation dialog
+      $('#draw-dialog').reveal();
+    }
   });
 
 
