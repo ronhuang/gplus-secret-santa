@@ -21,7 +21,7 @@
         <div class="presents">
           {% for gift in query %}
           <img src="{{ gift.orbit_url }}" alt="{{ gift.message|e }}" data-caption="#gift-{{ loop.index }}" />
-          <span class="orbit-caption" id="gift-{{ loop.index }}"><a href="/gift/{{ gift.ident }}">#{{ gift.ident }}</a> {{ gift.message|e }}</span>
+          <span class="orbit-caption" id="gift-{{ loop.index }}">#{{ gift.ident }} {{ gift.message|e }}</span>
           {% endfor %}
         </div>
       </div>
