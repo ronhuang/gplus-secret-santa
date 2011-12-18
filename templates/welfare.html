@@ -4,12 +4,12 @@
 
 {% block subtitle %}福委專區{% endblock %}
 
-{% block subheader %}新增小助手、切換抽獎狀態、檢視抽獎結果{% endblock %}
+{% block subheader %}新增小麋鹿、切換抽獎狀態、檢視抽獎結果{% endblock %}
 
 {% block content %}
         <div class="row">
           <div class="six columns">
-            <h4>登錄小助手</h4>
+            <h4>登錄小麋鹿</h4>
             <form id="register" class="nice" action="/api/user/register" method="post">
               <label for="register-ident">工號</label>
               <input type="text" placeholder="00289" class="small input-text"
@@ -19,7 +19,7 @@
             </form>
           </div>
           <div class="six columns">
-            <h4>移除小助手</h4>
+            <h4>移除小麋鹿</h4>
             <form id="delete" class="nice" action="/api/user/delete" method="post">
               <label for="delete-ident">工號</label>
               <input type="text" placeholder="00289" class="small input-text"
