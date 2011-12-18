@@ -166,7 +166,7 @@ class HomeHandler(BaseHandler):
     def get(self):
         query = db.GqlQuery("SELECT * FROM Gift WHERE picture != NULL ORDER BY picture DESC, updated DESC LIMIT 10")
 
-        self.render_template('home.html', query=query)
+        self.render_template('home.html', query=query, count=query.count())
 
 
 class HelperHandler(BaseHandler):
