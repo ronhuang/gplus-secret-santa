@@ -289,13 +289,31 @@ $(document).ready(function () {
 
 
   /* draw */
+  var checkDrawResultTimer;
+  var checkDrawResult = function() {
+    $.get('/api/draw', function(data) {
+      var message;
+      if (data.result == 'success') {
+        message = '<div class="alert-box success" style="display: none;">' +
+          '抽獎完成。' +
+          '</div>';
+        clearTimeout(checkDrawResultTimer);
+      } else if (data.result == 'incomplete') {
+        message = '<div class="alert-box warning" style="display: none;">' +
+          '抽獎會花一點時間，請耐心等待。目前還剩下 ' + data.left + '個。' +
+          '</div>';
+      }
+      $(message).prependTo('#log').fadeIn();
+    });
+  };
   var drawed = function(data, status) {
     // message for log
     var message;
-    if (data.result == 'success') {
-      message = '<div class="alert-box success" style="display: none;">' +
-        '抽獎成功。' +
+    if (data.result == 'incomplete') {
+      message = '<div class="alert-box warning" style="display: none;">' +
+        '抽獎會花一點時間，請耐心等待。' +
         '</div>';
+      checkDrawResultTimer = setTimeout(checkDrawResult, 1000);
     } else if (data.result == 'invalid_state') {
       message = '<div class="alert-box error" style="display: none;">' +
         '階段不正確。' +

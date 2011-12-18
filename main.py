@@ -10,7 +10,7 @@ from __future__ import with_statement
 import json, random, string, hashlib, logging, re, urllib, webapp2
 
 from google.appengine.api import images, files
-from google.appengine.ext import db, blobstore
+from google.appengine.ext import db, blobstore, deferred
 
 from webapp2 import Route
 from webapp2_extras import jinja2
@@ -392,9 +392,60 @@ class StatsHandler(BaseHandler):
         self.render_template('stats.html', users=users, gifts=gifts)
 
 
-class DrawHandler(BaseHandler):
+def assign_taker(gift_key, taker_key, auth_key):
+    gift = db.get(gift_key)
+    taker = db.get(taker_key)
+    gift.taker = taker
+    gift.put()
+
+    msg = "gift %s assigned to user %s" % (gift.ident, taker.ident)
+    auth = db.get(auth_key)
+    log = Log(message=msg, who=auth)
+    log.put()
+
+
+class DrawApiHandler(BaseHandler):
+    def shuffle(self, items):
+        return items
+
     def draw(self):
-        pass
+        gifts = db.GqlQuery("SELECT * FROM Gift")
+        gift_keys = []
+        taker_keys = []
+        for gift in gifts:
+            gift_keys.append(gift.key())
+            taker_keys.append(gift.giver.key())
+
+        self.shuffle(taker_keys)
+
+        count = gifts.count()
+        auth_key = self.auth.key()
+        for i in range(count):
+            deferred.defer(assign_taker, gift_keys[i], taker_keys[i], auth_key)
+
+    def get(self):
+        # check if the draw process is complete
+        if not self.auth:
+            return self.redirect_to("login", returnpath="draw-api")
+
+        if self.auth.role > ROLE_WELFARE:
+            return self.render_template('bad.html')
+
+        query = db.GqlQuery("SELECT * FROM Gift WHERE taker = NULL")
+        left = query.count()
+
+        args = {}
+        if left == 0:
+            args['result'] = 'success'
+        else:
+            args['result'] = 'incomplete'
+            args['left'] = left
+            query = db.GqlQuery("SELECT * FROM Gift")
+            total = query.count()
+            args['total'] = total
+
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(json.dumps(args))
 
     def post(self):
         current = State.get_or_insert('current').state
@@ -406,7 +457,8 @@ class DrawHandler(BaseHandler):
             args['result'] = 'invalid_state'
         else:
             self.draw()
-            args['result'] = 'success'
+            self.add_log('draw')
+            args['result'] = 'incomplete'
 
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(json.dumps(args))
@@ -443,9 +495,11 @@ class LoginApiHandler(BaseHandler):
         user = query.get()
         isValidUser = user and user.ident != 0 and user.check_passwd(passwd)
         if isValidUser and returnpath:
+            self.add_log('user %s login successful' % (ident))
             self.session['ident'] = ident
             self.redirect_to(returnpath)
         elif returnpath:
+            self.add_log('user %s login failed' % (ident))
             self.session.add_flash('unauthorized')
             self.redirect_to("login", returnpath=returnpath)
         else:
@@ -628,7 +682,7 @@ application = webapp2.WSGIApplication([
         Route(r'/login', handler=LoginHandler, name='login'),
         Route(r'/logout', handler=LogoutHandler, name='logout'),
         Route(r'/admin', handler=AdminHandler, name='admin'),
-        Route(r'/draw', handler=DrawHandler, name='draw'),
+        Route(r'/api/draw', handler=DrawApiHandler, name='draw-api'),
         Route(r'/api/user/<action:register|delete|reset|update>', handler=UserApiHandler, name='user-api'),
         Route(r'/api/login', handler=LoginApiHandler, name='login-api'),
         Route(r'/api/gift/<action:register|upload>', handler=GiftApiHandler, name='gift-api'),

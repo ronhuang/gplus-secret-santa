@@ -62,7 +62,7 @@
           </div>
           <div class="six columns draw">
             <h4>抽獎</h4>
-            <a id="draw" class="small green nice button radius {% if current != 1 %}disabled{% endif %}" href="/draw">抽獎</a>
+            <a id="draw" class="small green nice button radius {% if current != 1 %}disabled{% endif %}" href="/api/draw">抽獎</a>
           </div>
         </div>
         <hr>
@@ -96,6 +96,7 @@
   <div id="draw-dialog" class="reveal-modal">
 	<h2>確定要抽獎嗎？</h2>
 	<p class="lead">之前抽獎的結果都會消失！</p>
+    <p>這會花一點時間，請耐心等待。</p>
     <a class="close-reveal-modal">×</a>
     <button class="nice red radius button draw">抽獎</button>
   </div>

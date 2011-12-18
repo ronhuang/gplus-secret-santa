@@ -10,6 +10,10 @@ libraries:
 - name: markupsafe
   version: latest
 
+builtins:
+- datastore_admin: on
+- deferred: on
+
 handlers:
 - url: /humans.txt
   static_files: humans.txt
