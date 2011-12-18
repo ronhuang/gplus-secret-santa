@@ -444,6 +444,7 @@ class GiftApiHandler(BaseHandler):
                 blob_key = None
         else:
             args['result'] = 'invalid'
+            args['invalid'] = info['error']
 
         return blob_key, args
 

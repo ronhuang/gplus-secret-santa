@@ -46,8 +46,12 @@
             {% if args and args.result == 'more' %}
             <div class="alert-box warning">禮物登錄不完整，還缺：{{ args.more }}。</div>
             {% endif %}
-            {% if args and args.result == 'invalid' %}
-            <div class="alert-box warning">禮物照片不正確。</div>
+            {% if args and args.result == 'invalid' and args.invalid == 'maxFileSize' %}
+            <div class="alert-box error">禮物照片大小不正確，請先縮小至 1 MB 以下。</div>
+            {% elif args and args.result == 'invalid' and args.invalid == 'acceptFileTypes' %}
+            <div class="alert-box error">禮物照片格式不正確，僅支援 jpg、gif、png。</div>
+            {% elif args and args.result == 'invalid' %}
+            <div class="alert-box error">禮物照片不正確。</div>
             {% endif %}
           </div>
         </div>
