@@ -4,14 +4,14 @@
 
 {% block subtitle %}小麋鹿專區{% endblock %}
 
-{% block subheader %}新增乖小孩子{% endblock %}
+{% block subheader %}新增乖孩子{% endblock %}
 
 {% block class %}helper{% endblock %}
 
 {% block content %}
         <div class="row">
           <div class="six columns">
-            <h4>登錄乖小孩子</h4>
+            <h4>登錄乖孩子</h4>
             <form id="register" class="nice" action="/api/user/register" method="post">
               <label for="register-ident">工號</label>
               <input type="text" placeholder="00289" class="small input-text"
@@ -24,7 +24,7 @@
             </form>
           </div>
           <div class="six columns">
-            <h4>移除乖小孩子</h4>
+            <h4>移除乖孩子</h4>
             <form id="delete" class="nice" action="/api/user/delete" method="post">
               <label for="delete-ident">工號</label>
               <input type="text" placeholder="00289" class="small input-text"
@@ -56,7 +56,7 @@
   <div id="register-dialog" class="reveal-modal">
 	<h2>工號 <span class="ident"></span> 登錄成功</h2>
 	<p class="lead">密碼：<span class="passwd"></span>，禮物編號：<span class="gift"></span>。</p>
-	<p>乖小孩子要記牢密碼！不然得再跟福委申請。</p>
+	<p>乖孩子要記牢密碼！不然得再跟福委申請。</p>
     <a class="close-reveal-modal">×</a>
   </div>
 
