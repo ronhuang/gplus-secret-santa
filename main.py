@@ -392,6 +392,26 @@ class StatsHandler(BaseHandler):
         self.render_template('stats.html', users=users, gifts=gifts)
 
 
+class DrawHandler(BaseHandler):
+    def draw(self):
+        pass
+
+    def post(self):
+        current = State.get_or_insert('current').state
+        args = {}
+
+        if not self.auth or self.auth.role > ROLE_WELFARE:
+            args['result'] = 'unauthorized'
+        elif current != STATE_REGISTER_END:
+            args['result'] = 'invalid_state'
+        else:
+            self.draw()
+            args['result'] = 'success'
+
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(json.dumps(args))
+
+
 class LoginHandler(BaseHandler):
     def get(self):
         returnpath = self.request.get('returnpath')
@@ -608,6 +628,7 @@ application = webapp2.WSGIApplication([
         Route(r'/login', handler=LoginHandler, name='login'),
         Route(r'/logout', handler=LogoutHandler, name='logout'),
         Route(r'/admin', handler=AdminHandler, name='admin'),
+        Route(r'/draw', handler=DrawHandler, name='draw'),
         Route(r'/api/user/<action:register|delete|reset|update>', handler=UserApiHandler, name='user-api'),
         Route(r'/api/login', handler=LoginApiHandler, name='login-api'),
         Route(r'/api/gift/<action:register|upload>', handler=GiftApiHandler, name='gift-api'),

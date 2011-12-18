@@ -273,12 +273,50 @@ $(document).ready(function () {
         '</div>';
     }
     $(message).prependTo('#log').fadeIn();
+
+    if (data.state == 1) {
+      $('#draw').removeClass('disabled');
+    } else {
+      $('#draw').addClass('disabled');
+    }
   };
   $('#change').submit(function (e) {
     e.preventDefault();
 
     var action = $('#change').attr('action');
     $.post(action, $('#change').serialize(), stateChanged, 'json');
+  });
+
+
+  /* draw */
+  var drawed = function(data, status) {
+    // message for log
+    var message;
+    if (data.result == 'success') {
+      message = '<div class="alert-box success" style="display: none;">' +
+        '抽獎成功。' +
+        '</div>';
+    } else if (data.result == 'invalid_state') {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '階段不正確。' +
+        '</div>';
+    } else {
+      message = '<div class="alert-box error" style="display: none;">' +
+        '抽獎失敗。' +
+        '</div>';
+    }
+    $(message).prependTo('#log').fadeIn();
+  };
+  $('#draw-dialog .draw').click(function() {
+    var action = $('#draw').attr('href');
+    $.post(action, null, drawed, 'json');
+    $('#draw-dialog').trigger('reveal:close');
+  });
+  $('#draw').click(function(e) {
+    e.preventDefault();
+
+    // show confirmation dialog
+    $('#draw-dialog').reveal();
   });
 
 
