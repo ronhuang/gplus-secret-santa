@@ -149,7 +149,7 @@ header p a {
    About page
 ----------------------------------------- */
 #about {
-  min-height: 618px !important;
+  min-height: 418px !important;
   background-image: url(/images/about.jpg);
   background-repeat: no-repeat;
   background-position: center center;
