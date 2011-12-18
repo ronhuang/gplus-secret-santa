@@ -233,7 +233,7 @@ class GoodHandler(BaseHandler):
         pass
 
     def maintenance(self):
-        pass
+        self.render_template('maintenance.html')
 
 
 def inc_counter(key):
