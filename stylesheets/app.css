@@ -72,7 +72,7 @@ body.home {
 
 #header {
   min-height: 600px !important;
-  background-image: url(/images/gift-bg.png);
+  background-image: url(/images/gift-bg.jpg);
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -128,7 +128,7 @@ header p a {
 
 #sidebar {
   min-height: 600px !important;
-  background-image: url(/images/helper-bg.png);
+  background-image: url(/images/helper-bg.jpg);
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -142,7 +142,7 @@ header p a {
 }
 
 .good #sidebar {
-  background-image: url(/images/good-bg.png);
+  background-image: url(/images/good-bg.jpg);
 }
 
 /* -----------------------------------------
