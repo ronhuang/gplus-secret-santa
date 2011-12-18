@@ -18,13 +18,13 @@
       {% endif %}
       <div class="three columns">
         {% if gift.url %}
-        <a class="lightbox" href="{{ gift.url }}" title="{{ gift.description|e if gift.description }}">
+        <a class="lightbox" href="{{ gift.url }}" title="{{ gift.message|e if gift.message }}">
         {% endif %}
-          <img src="{{ gift.grid_url if gift.grid_url else "images/cell.jpg" }}" alt="{{ gift.message|e if gift.message }}" />
+          <img src="{{ gift.grid_url if gift.grid_url else "images/cell.jpg" }}" />
         {% if gift.url %}
         </a>
         {% endif %}
-        <div class="gift-caption">#{{ gift.ident }} {{ gift.message|e if gift.message }}</div>
+        <div class="gift-caption">#{{ gift.ident }} {{ gift.description|e if gift.description }}</div>
       </div>
       {% if loop.index0 % 4 == 3 %}
     </div>

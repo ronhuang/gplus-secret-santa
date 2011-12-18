@@ -21,8 +21,8 @@
       <div class="five columns centered">
         <div class="presents">
           {% for gift in query %}
-          <img src="{{ gift.orbit_url }}" alt="{{ gift.message|e }}" data-caption="#gift-{{ loop.index }}" />
-          <span class="orbit-caption" id="gift-{{ loop.index }}">#{{ gift.ident }} {{ gift.message|e }}</span>
+          <img src="{{ gift.orbit_url }}" data-caption="#gift-{{ loop.index }}" />
+          <span class="orbit-caption" id="gift-{{ loop.index }}">#{{ gift.ident }} {{ gift.description|e if gift.description }}</span>
           {% endfor %}
         </div>
       </div>
