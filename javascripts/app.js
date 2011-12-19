@@ -414,8 +414,12 @@ $(document).ready(function () {
     }
   };
   var loadGallery = function(url) {
+    $('.loading').show();
+    $('.load-more').addClass('disabled')
+
     $.get(url, function(data) {
       if (data.result == 'success') {
+        $('.loading').hide();
         populateGallery(data);
       } else {
         // TODO: show error message.
