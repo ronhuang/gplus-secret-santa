@@ -572,8 +572,15 @@ class GiftApiHandler(BaseHandler):
     def handle_upload(self, args):
         pic = None
         for name, field in self.request.POST.items():
-            pic = field
-            break
+            if type(field) is unicode:
+                continue
+            if hasattr(field, 'filename'):
+                pic = field
+                break
+
+        if not hasattr(pic, 'filename'):
+            args['result'] = 'invalid'
+            return None, args
 
         blob_key = None
         info = {
