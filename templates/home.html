@@ -20,7 +20,7 @@
     <div class="row">
       <div class="five columns centered">
         <div class="presents">
-          {% for gift in query %}
+          {% for gift in gifts %}
           <img src="{{ gift.orbit_url }}" data-caption="#gift-{{ loop.index }}" />
           <span class="orbit-caption" id="gift-{{ loop.index }}">#{{ gift.ident }} {{ gift.description|e if gift.description }}</span>
           {% endfor %}

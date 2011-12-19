@@ -9,7 +9,7 @@ from __future__ import with_statement
 
 import json, random, string, hashlib, logging, re, urllib, itertools, webapp2
 
-from google.appengine.api import images, files
+from google.appengine.api import images, files, memcache
 from google.appengine.ext import db, blobstore, deferred
 
 from webapp2 import Route
@@ -60,6 +60,11 @@ class User(db.Model):
     executive = db.BooleanProperty(default=False)
     role = db.IntegerProperty(required=True)
 
+    def put(self):
+        res = super(User, self).put()
+        memcache.delete("stats.users")
+        return res
+
     def check_passwd(self, passwd):
         return self.passwd == hashlib.md5(passwd).hexdigest()
 
@@ -84,6 +89,18 @@ class Gift(db.Model):
     picture = blobstore.BlobReferenceProperty()
     giver = db.ReferenceProperty(User, collection_name='give_set', required=True)
     taker = db.ReferenceProperty(User, collection_name='take_set')
+
+    def put(self):
+        res = super(Gift, self).put()
+
+        memcache.delete("home.gifts")
+        memcache.delete("gifts.count")
+        for page in range(1, 31):
+            cache_key = "gifts.json.%d" % (page)
+            memcache.delete(cache_key)
+        memcache.delete("stats.gifts")
+
+        return res
 
     @property
     def is_complete(self):
@@ -140,6 +157,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         body = self.jinja2.render_template(filename, **template_args)
         self.response.write(body)
+        return body
 
     def dispatch(self):
         # Get a session store for this request.
@@ -174,19 +192,36 @@ class BaseHandler(webapp2.RequestHandler):
 
 class HomeHandler(BaseHandler):
     def get(self):
-        query = db.GqlQuery("SELECT * FROM Gift WHERE picture != NULL ORDER BY picture DESC, updated DESC LIMIT 10")
-        self.render_template('home.html', query=query, count=query.count())
+        gifts = memcache.get("home.gifts")
+        if gifts is None:
+            query = db.GqlQuery("SELECT * FROM Gift WHERE picture != NULL ORDER BY picture DESC, updated DESC LIMIT 10")
+            gifts = query.fetch(10)
+            memcache.set("home.gifts", gifts)
+
+        self.render_template('home.html', gifts=gifts, count=len(gifts))
 
 
 class GiftsHandler(BaseHandler):
     def get(self):
-        query = db.GqlQuery("SELECT * FROM Gift")
-        self.render_template('gifts.html', count=query.count())
+        count = memcache.get("gifts.count")
+        if count is None:
+            query = db.GqlQuery("SELECT * FROM Gift")
+            count = query.count()
+            memcache.set("gifts.count", count)
+
+        self.render_template('gifts.html', count=count)
 
 
 class GiftsApiHandler(BaseHandler):
     def get(self, page):
         page = int(page)
+        cache_key = "gifts.json.%d" % (page)
+
+        self.response.headers['Content-Type'] = 'application/json'
+
+        body = memcache.get(cache_key)
+        if body is not None:
+            return self.response.write(body)
 
         query = db.GqlQuery("SELECT * FROM Gift ORDER BY created")
         pagedQuery = paging.PagedQuery(query, 8)
@@ -200,14 +235,15 @@ class GiftsApiHandler(BaseHandler):
         hasNextPage = pagedQuery.has_page(page + 1)
         hasPrevPage = pagedQuery.has_page(page - 1) if page > 1 else False
 
-        self.response.headers['Content-Type'] = 'application/json'
-        self.render_template('gifts.json',
-                             result='success',
-                             page=page,
-                             count=len(gifts),
-                             gifts=gifts,
-                             hasNextPage=hasNextPage,
-                             hasPrevPage=hasPrevPage)
+        body = self.render_template('gifts.json',
+                                    result='success',
+                                    page=page,
+                                    count=len(gifts),
+                                    gifts=gifts,
+                                    hasNextPage=hasNextPage,
+                                    hasPrevPage=hasPrevPage)
+
+        memcache.set(cache_key, body)
 
 
 class HelperHandler(BaseHandler):
@@ -425,8 +461,16 @@ class StatsHandler(BaseHandler):
         if self.auth.role > ROLE_WELFARE:
             return self.render_template('bad.html')
 
-        users = db.GqlQuery("SELECT * FROM User WHERE ident != :1", "0")
-        gifts = db.GqlQuery("SELECT * FROM Gift")
+        users = memcache.get("stats.users")
+        if users is None:
+            users = db.GqlQuery("SELECT * FROM User WHERE ident != :1", "0")
+            memcache.set("stats.users", users)
+
+        gifts = memcache.get("stats.gifts")
+        if gifts is None:
+            gifts = db.GqlQuery("SELECT * FROM Gift")
+            memcache.set("stats.gifts", gifts)
+
         self.render_template('stats.html', users=users, gifts=gifts)
 
 
