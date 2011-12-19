@@ -16,7 +16,7 @@ from webapp2 import Route
 from webapp2_extras import jinja2
 from webapp2_extras import sessions
 
-import prefs
+import prefs, paging
 
 
 ROLE_ADMIN = 0
@@ -180,8 +180,34 @@ class HomeHandler(BaseHandler):
 
 class GiftsHandler(BaseHandler):
     def get(self):
+        query = db.GqlQuery("SELECT * FROM Gift")
+        self.render_template('gifts.html', count=query.count())
+
+
+class GiftsApiHandler(BaseHandler):
+    def get(self, page):
+        page = int(page)
+
         query = db.GqlQuery("SELECT * FROM Gift ORDER BY created")
-        self.render_template('gifts.html', gifts=query, count=query.count())
+        pagedQuery = paging.PagedQuery(query, 8)
+
+        gifts = None
+        if page > 1:
+            gifts = pagedQuery.fetch_page(page)
+        else:
+            gifts = pagedQuery.fetch_page()
+
+        hasNextPage = pagedQuery.has_page(page + 1)
+        hasPrevPage = pagedQuery.has_page(page - 1) if page > 1 else False
+
+        self.response.headers['Content-Type'] = 'application/json'
+        self.render_template('gifts.json',
+                             result='success',
+                             page=page,
+                             count=len(gifts),
+                             gifts=gifts,
+                             hasNextPage=hasNextPage,
+                             hasPrevPage=hasPrevPage)
 
 
 class HelperHandler(BaseHandler):
@@ -737,4 +763,5 @@ application = webapp2.WSGIApplication([
         Route(r'/api/gift/<action:register|upload>', handler=GiftApiHandler, name='gift-api'),
         Route(r'/api/state/<action:change>', handler=StateApiHandler, name='state-api'),
         Route(r'/api/result/<action:fetch>', handler=ResultApiHandler, name='result-api'),
+        Route(r'/api/gifts/<page:\d+>', handler=GiftsApiHandler, name='gifts-api'),
         ], config=config, debug=True)

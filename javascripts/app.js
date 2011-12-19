@@ -365,6 +365,77 @@ $(document).ready(function () {
   });
 
 
+  /* load gift pictures */
+  var populateGallery = function(data) {
+    var gifts = data.gifts;
+    var count = data.count;
+    var page = data.page;
+
+    var container = $('<div style="display: none;"></div>');
+    var row = null;
+
+    for (var i = 0; i < count; i++) {
+      var gift = gifts[i];
+
+      var cell = null
+      if (gift.url) {
+        cell = $('.cell-light-tmpl:last').clone();
+        cell.find('.lightbox').attr('href', gift.url).attr('title', gift.message);
+      } else {
+        cell = $('.cell-tmpl:last').clone();
+      }
+      cell.find('img').attr('src', gift.grid_url);
+      cell.find('.gift-caption').text('#' + gift.ident + ' ' + gift.description);
+
+      if (i % 4 == 0)
+        row = $('.row-tmpl:last').clone();
+      row.append(cell);
+
+      if (i % 4 == 3) {
+        row.show();
+        container.append(row);
+        row = null;
+      }
+    }
+
+    if (row) {
+      row.show();
+      container.append(row);
+      row = null;
+    }
+
+    container.find('a.lightbox').lightBox();
+    container.appendTo($('.gallery')).fadeIn();
+
+    if (data.hasNextPage) {
+      $('.load-more').removeClass('disabled').attr('href', '/api/gifts/' + (page + 1));
+    } else {
+      $('.load-more').addClass('disabled').attr('href', '#');
+    }
+  };
+  var loadGallery = function(url) {
+    $.get(url, function(data) {
+      if (data.result == 'success') {
+        populateGallery(data);
+      } else {
+        // TODO: show error message.
+      }
+    });
+  };
+  if ($('.gallery').length) {
+    loadGallery('/api/gifts/1');
+  }
+  $('.load-more').click(function(e) {
+    e.preventDefault();
+
+    var btn = $('.load-more');
+    if (!btn.hasClass('disabled')) {
+      var url = btn.attr('href');
+      loadGallery(url);
+    }
+  });
+
+
   /* TABS --------------------------------- */
   /* Remove if you don't need :) */
 

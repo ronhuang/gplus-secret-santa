@@ -12,27 +12,30 @@
       </div>
     </div>
 
-    {% for gift in gifts %}
-      {% if loop.first %}
-    <div class="row grid">
-      {% endif %}
-      <div class="three columns">
-        {% if gift.url %}
-        <a class="lightbox" href="{{ gift.url }}" title="{{ gift.message|e if gift.message }}">
-        {% endif %}
-          <img src="{{ gift.grid_url if gift.grid_url else "images/cell.jpg" }}" />
-        {% if gift.url %}
-        </a>
-        {% endif %}
-        <div class="gift-caption">#{{ gift.ident }} {{ gift.description|e if gift.description }}</div>
+    <div class="gallery"></div>
+    <div class="gallery-control">
+      <div class="row grid">
+        <div class="three columns centered">
+          <a href="/api/gifts/1" class="nice small radius white button disabled load-more">更多...</a>
+        </div>
       </div>
-      {% if loop.index0 % 4 == 3 %}
     </div>
-    <div class="row grid">
-      {% endif %}
-      {% if loop.last %}
+
+    <div style="display: none;">
+      <div class="row grid row-tmpl">
+      </div>
+
+      <div class="three columns cell-light-tmpl">
+        <a class="lightbox" href="" title="">
+          <img src="" />
+        </a>
+        <div class="gift-caption"></div>
+      </div>
+
+      <div class="three columns cell-tmpl">
+        <img src="" />
+        <div class="gift-caption"></div>
+      </div>
     </div>
-      {% endif %}
-    {% endfor %}
   </div>
 {% endblock %}

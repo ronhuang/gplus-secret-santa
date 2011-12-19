@@ -1,0 +1,18 @@
+{
+  "result": "{{ result }}",
+  "page": {{ page }},
+  "count": {{ count }},
+  "gifts": [
+    {% for gift in gifts -%}
+    {
+      "ident": "{{ gift.ident }}",
+      "message": "{{ gift.message|e if gift.message }}",
+      "description": "{{ gift.description|e if gift.description }}",
+      "url": {% if gift.url %}"{{ gift.url }}"{% else %}false{% endif %},
+      "grid_url": "{{ gift.grid_url if gift.grid_url else "images/cell.jpg" }}"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+  "hasPrevPage": {{ "true" if hasPrevPage else "false" }},
+  "hasNextPage": {{ "true" if hasNextPage else "false" }}
+}
