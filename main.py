@@ -459,7 +459,7 @@ class WelfareHandler(BaseHandler):
 
         gifts = memcache.get("stats.gifts")
         if gifts is None:
-            gifts = db.GqlQuery("SELECT * FROM Gift")
+            gifts = db.GqlQuery("SELECT * FROM Gift ORDER BY created")
             memcache.set("stats.gifts", gifts)
 
         args = None
