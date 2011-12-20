@@ -454,7 +454,7 @@ $(document).ready(function () {
     if (data.result == 'success') {
       $('input[name=desc]').val(data.description);
       $('input[name=bless]').val(data.message);
-      $('input[name=ident]').val(data.ident);
+      $('input[name=ident][type=hidden]').val(data.ident);
       if (data.url)
         $('img.gift-thumbnail').attr('src', data.thumbnail_url).show();
       else
@@ -470,7 +470,7 @@ $(document).ready(function () {
     if (ident.length <= 0) {
       $('input[name=desc]').val('');
       $('input[name=bless]').val('');
-      $('input[name=ident]').val('');
+      $('input[name=ident][type=hidden]').val('');
       $('img.gift-thumbnail').hide();
       return;
     }
