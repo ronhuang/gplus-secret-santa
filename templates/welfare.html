@@ -9,6 +9,16 @@
 {% block class %}welfare{% endblock %}
 
 {% block content %}
+        <dl class="tabs">
+          <dd><a href="#user" class="active"><strong>修改使用者</strong></a></dd>
+          <dd><a href="#gift" class=""><strong>修改禮物</strong></a></dd>
+          <dd><a href="#draw" class=""><strong>抽獎</strong></a></dd>
+          <dd><a href="#users" class=""><strong>使用者表</strong></a></dd>
+          <dd><a href="#gifts" class=""><strong>禮物表</strong></a></dd>
+        </dl>
+
+        <ul class="tabs-content">
+          <li class="active" id="userTab">
         <div class="row">
           <div class="six columns">
             <h4>登錄小麋鹿</h4>
@@ -41,6 +51,14 @@
               <button type="submit" class="small green nice button radius">重置</button>
             </form>
           </div>
+        </div>
+          </li>
+
+          <li class="" id="giftTab">
+          </li>
+
+          <li class="" id="drawTab">
+        <div class="row">
           <div class="six columns">
             <h4>變更抽獎階段</h4>
             <form id="change" class="nice" action="/api/state/change" method="post">
@@ -53,18 +71,32 @@
               <button type="submit" class="small green nice button radius">變更</button>
             </form>
           </div>
-        </div>
-        <hr>
-        <div class="row">
-          <div class="six columns">
-            <h4>資料統計</h4>
-            <a href="/stats">資料統計 »</a>
-          </div>
           <div class="six columns draw">
             <h4>抽獎</h4>
             <a id="draw" class="small green nice button radius {% if current != 1 %}disabled{% endif %}" href="/api/draw">抽獎</a>
           </div>
         </div>
+          </li>
+
+          <li class="" id="usersTab">
+        <div class="row">
+          <div class="six columns">
+            <h4>資料統計</h4>
+            <a href="/stats">資料統計 »</a>
+          </div>
+        </div>
+          </li>
+
+          <li class="" id="giftsTab">
+        <div class="row">
+          <div class="six columns">
+            <h4>資料統計</h4>
+            <a href="/stats">資料統計 »</a>
+          </div>
+        </div>
+          </li>
+
+        </ul>
         <hr>
         <div class="row">
           <div id="log" class="twelve columns">
