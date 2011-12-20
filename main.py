@@ -197,7 +197,7 @@ class HomeHandler(BaseHandler):
         if gifts is None:
             query = db.GqlQuery("SELECT * FROM Gift ORDER BY updated DESC LIMIT 20")
             gifts = query.fetch(20)
-            gifts = [gift for gift in gifts if gift.url]
+            gifts = [{"ident": gift.ident, "orbit_url": gift.orbit_url, "description": gift.description} for gift in gifts if gift.url]
             memcache.set("home.gifts", gifts)
 
         self.render_template('home.html', gifts=gifts, count=len(gifts))
