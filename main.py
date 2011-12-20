@@ -194,8 +194,9 @@ class HomeHandler(BaseHandler):
     def get(self):
         gifts = memcache.get("home.gifts")
         if gifts is None:
-            query = db.GqlQuery("SELECT * FROM Gift WHERE picture != NULL ORDER BY picture DESC, updated DESC LIMIT 10")
-            gifts = query.fetch(10)
+            query = db.GqlQuery("SELECT * FROM Gift ORDER BY updated DESC LIMIT 20")
+            gifts = query.fetch(20)
+            gifts = [gift for gift in gifts if gift.url]
             memcache.set("home.gifts", gifts)
 
         self.render_template('home.html', gifts=gifts, count=len(gifts))
