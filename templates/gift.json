@@ -1,0 +1,8 @@
+{
+  "result": "success",
+  "ident": "{{ gift.ident }}",
+  "message": "{{ gift.message|e if gift.message }}",
+  "description": "{{ gift.description|e if gift.description }}",
+  "url": {% if gift.url %}"{{ gift.url }}"{% else %}false{% endif %},
+  "thumbnail_url": "{{ gift.grid_url if gift.grid_url else "images/cell.jpg" }}"
+}

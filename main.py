@@ -99,6 +99,7 @@ class Gift(db.Model):
             cache_key = "gifts.json.%d" % (page)
             memcache.delete(cache_key)
         memcache.delete("stats.gifts")
+        memcache.delete("gift.%s" % (self.ident))
 
         return res
 
@@ -450,21 +451,6 @@ class WelfareHandler(BaseHandler):
             return self.render_template('bad.html')
 
         current = State.get_or_insert('current').state
-        self.render_template('welfare.html', current=current, states=STATE_LABELS)
-
-
-class AboutHandler(BaseHandler):
-    def get(self):
-        self.render_template('about.html')
-
-
-class StatsHandler(BaseHandler):
-    def get(self):
-        if not self.auth:
-            return self.redirect_to("login", returnpath="stats")
-
-        if self.auth.role > ROLE_WELFARE:
-            return self.render_template('bad.html')
 
         users = memcache.get("stats.users")
         if users is None:
@@ -476,7 +462,22 @@ class StatsHandler(BaseHandler):
             gifts = db.GqlQuery("SELECT * FROM Gift")
             memcache.set("stats.gifts", gifts)
 
-        self.render_template('stats.html', users=users, gifts=gifts)
+        args = None
+        flashes = self.session.get_flashes()
+        for flash in flashes:
+            args = flash[0]
+
+        self.render_template('welfare.html',
+                             current=current,
+                             states=STATE_LABELS,
+                             users=users,
+                             gifts=gifts,
+                             args=args)
+
+
+class AboutHandler(BaseHandler):
+    def get(self):
+        self.render_template('about.html')
 
 
 def assign_taker(gift_key, taker_key, auth_key):
@@ -683,12 +684,23 @@ class GiftApiHandler(BaseHandler):
         if not self.auth:
             args['result'] = 'unauthorized'
         elif action == 'register':
-            gift = self.auth.give_set.get()
-            gift.description = self.request.get('desc')
-            gift.message = self.request.get('bless')
-            gift.put()
+            gift = None
+            ident = self.request.get('ident', default_value=None)
+            if ident:
+                query = db.GqlQuery("SELECT * FROM Gift WHERE ident = :1", ident)
+                args['ident'] = ident
+                gift = query.get()
+            else:
+                gift = self.auth.give_set.get()
 
-            if not gift.is_complete:
+            if gift:
+                gift.description = self.request.get('desc')
+                gift.message = self.request.get('bless')
+                gift.put()
+
+            if not gift:
+                args['result'] = 'nonexist'
+            elif not gift.is_complete:
                 args['result'] = 'more'
                 more = []
                 if not gift.description:
@@ -709,16 +721,30 @@ class GiftApiHandler(BaseHandler):
                 return self.redirect_to("good")
 
             # image uploaded succesfully
-            gift = self.auth.give_set.get()
-            old_blob = gift.picture
-            blob = blobstore.get(blob_key)
-            gift.picture = blob
-            gift.put()
+            gift = None
+            ident = self.request.get('ident', default_value=None)
+            if ident:
+                query = db.GqlQuery("SELECT * FROM Gift WHERE ident = :1", ident)
+                args['ident'] = ident
+                gift = query.get()
+            else:
+                gift = self.auth.give_set.get()
+
+            if gift:
+                old_blob = gift.picture
+                blob = blobstore.get(blob_key)
+                gift.picture = blob
+                gift.put()
+            else:
+                # delete the newly upload blob
+                old_blob = blobstore.get(blob_key)
 
             if old_blob:
                 old_blob.delete()
 
-            if not gift.is_complete:
+            if not gift:
+                args['result'] = 'nonexist'
+            elif not gift.is_complete:
                 args['result'] = 'more'
                 more = []
                 if not gift.description:
@@ -732,12 +758,37 @@ class GiftApiHandler(BaseHandler):
                 args['result'] = 'success'
 
             self.session.add_flash(args)
-            return self.redirect_to("good")
+            route = self.request.get('route', default_value='good')
+            fragment = self.request.get('fragment', default_value=None)
+            if fragment:
+                return self.redirect_to(route, _fragment=fragment)
+            else:
+                return self.redirect_to(route)
         else:
             args['result'] = 'unknown_action'
 
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(json.dumps(args))
+
+
+class GiftFetchApiHandler(BaseHandler):
+    def get(self, ident):
+        self.response.headers['Content-Type'] = 'application/json'
+
+        cache_key = "gift.%s" % (ident)
+        gift = memcache.get(cache_key)
+
+        if gift is not None:
+            return self.response.write(gift)
+
+        query = db.GqlQuery("SELECT * FROM Gift WHERE ident = :1", ident)
+        gift = query.get()
+
+        if gift:
+            gift = self.render_template('gift.json', gift=query.get())
+        else:
+            gift = self.response.write('{"result": "nonexist"}')
+        memcache.set(cache_key, gift)
 
 
 class StateApiHandler(BaseHandler):
@@ -802,7 +853,6 @@ application = webapp2.WSGIApplication([
         Route(r'/good', handler=GoodHandler, name='good'),
         Route(r'/welfare', handler=WelfareHandler, name='welfare'),
         Route(r'/about', handler=AboutHandler, name='about'),
-        Route(r'/stats', handler=StatsHandler, name='stats'),
         Route(r'/login', handler=LoginHandler, name='login'),
         Route(r'/logout', handler=LogoutHandler, name='logout'),
         Route(r'/admin', handler=AdminHandler, name='admin'),
@@ -810,6 +860,7 @@ application = webapp2.WSGIApplication([
         Route(r'/api/user/<action:register|delete|reset|update>', handler=UserApiHandler, name='user-api'),
         Route(r'/api/login', handler=LoginApiHandler, name='login-api'),
         Route(r'/api/gift/<action:register|upload>', handler=GiftApiHandler, name='gift-api'),
+        Route(r'/api/gift/<ident:\d+>', handler=GiftFetchApiHandler, name='gift-fetch-api'),
         Route(r'/api/state/<action:change>', handler=StateApiHandler, name='state-api'),
         Route(r'/api/result/<action:fetch>', handler=ResultApiHandler, name='result-api'),
         Route(r'/api/gifts/<page:\d+>', handler=GiftsApiHandler, name='gifts-api'),

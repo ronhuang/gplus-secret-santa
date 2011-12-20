@@ -440,6 +440,51 @@ $(document).ready(function () {
   });
 
 
+  /* stats table */
+  $('#users-table').tablesorter({
+    sortList: [[3, 0]]
+  });
+  $('#gifts-table').tablesorter({
+    sortList: [[4, 0]]
+  });
+
+
+  /* gift select */
+  var populateGift = function(data) {
+    if (data.result == 'success') {
+      $('input[name=desc]').val(data.description);
+      $('input[name=bless]').val(data.message);
+      $('input[name=ident]').val(data.ident);
+      if (data.url)
+        $('img.gift-thumbnail').attr('src', data.thumbnail_url).show();
+      else
+        $('img.gift-thumbnail').hide();
+    } else {
+      /* TODO: show error message */
+    }
+  };
+  $('select[name=gift-select]').change(function(e) {
+    e.preventDefault();
+
+    var ident = $('select[name=gift-select]').val();
+    if (ident.length <= 0) {
+      $('input[name=desc]').val('');
+      $('input[name=bless]').val('');
+      $('input[name=ident]').val('');
+      $('img.gift-thumbnail').hide();
+      return;
+    }
+
+    $.get('/api/gift/' + ident, function(data) {
+      if (data.result == 'success') {
+        populateGift(data);
+      } else {
+        // TODO: show error message.
+      }
+    });
+  });
+
+
   /* TABS --------------------------------- */
   /* Remove if you don't need :) */
 
@@ -467,15 +512,6 @@ $(document).ready(function () {
   if (window.location.hash) {
     activateTab($('a[href="' + window.location.hash + '"]'));
   }
-
-
-  /* stats table */
-  $('#participants').tablesorter({
-    sortList: [[3, 0]]
-  });
-  $('#gifts').tablesorter({
-    sortList: [[4, 0]]
-  });
 
 
   /* PLACEHOLDER FOR FORMS ------------- */

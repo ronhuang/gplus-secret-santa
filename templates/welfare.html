@@ -10,96 +10,198 @@
 
 {% block content %}
         <dl class="tabs">
-          <dd><a href="#user" class="active"><strong>修改使用者</strong></a></dd>
-          <dd><a href="#gift" class=""><strong>修改禮物</strong></a></dd>
-          <dd><a href="#draw" class=""><strong>抽獎</strong></a></dd>
-          <dd><a href="#users" class=""><strong>使用者表</strong></a></dd>
-          <dd><a href="#gifts" class=""><strong>禮物表</strong></a></dd>
+          <dd><a href="#tt1" class="active"><strong>修改使用者</strong></a></dd>
+          <dd><a href="#tt2" class=""><strong>修改禮物</strong></a></dd>
+          <dd><a href="#tt3" class=""><strong>抽獎</strong></a></dd>
+          <dd><a href="#tt4" class=""><strong>使用者表</strong></a></dd>
+          <dd><a href="#tt5" class=""><strong>禮物表</strong></a></dd>
         </dl>
 
         <ul class="tabs-content">
-          <li class="active" id="userTab">
-        <div class="row">
-          <div class="six columns">
-            <h4>登錄小麋鹿</h4>
-            <form id="register" class="nice" action="/api/user/register" method="post">
-              <label for="register-ident">工號</label>
-              <input type="text" placeholder="00289" class="small input-text"
-                     name="ident" id="register-ident" maxlength="5">
-              <input type="hidden" name="role" value="2000">
-              <button type="submit" class="small green nice button radius">登錄</button>
-            </form>
-          </div>
-          <div class="six columns">
-            <h4>移除小麋鹿</h4>
-            <form id="delete" class="nice" action="/api/user/delete" method="post">
-              <label for="delete-ident">工號</label>
-              <input type="text" placeholder="00289" class="small input-text"
-                     name="ident" id="delete-ident" maxlength="5">
-              <button type="submit" class="small red nice button radius">移除</button>
-            </form>
-          </div>
-        </div>
-        <hr>
-        <div class="row">
-          <div class="six columns">
-            <h4>重置密碼</h4>
-            <form id="reset" class="nice" action="/api/user/reset" method="post">
-              <label for="reset-ident">工號</label>
-              <input type="text" placeholder="00289" class="small input-text"
-                     name="ident" id="reset-ident" maxlength="5">
-              <button type="submit" class="small green nice button radius">重置</button>
-            </form>
-          </div>
-        </div>
+          <li class="active" id="tt1Tab">
+            <div class="row">
+              <div class="six columns">
+                <h4>登錄小麋鹿</h4>
+                <form id="register" class="nice" action="/api/user/register" method="post">
+                  <label for="register-ident">工號</label>
+                  <input type="text" placeholder="00289" class="small input-text"
+                         name="ident" id="register-ident" maxlength="5">
+                  <input type="hidden" name="role" value="2000">
+                  <button type="submit" class="small green nice button radius">登錄</button>
+                </form>
+              </div>
+              <div class="six columns">
+                <h4>移除小麋鹿</h4>
+                <form id="delete" class="nice" action="/api/user/delete" method="post">
+                  <label for="delete-ident">工號</label>
+                  <input type="text" placeholder="00289" class="small input-text"
+                         name="ident" id="delete-ident" maxlength="5">
+                  <button type="submit" class="small red nice button radius">移除</button>
+                </form>
+              </div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="six columns">
+                <h4>重置密碼</h4>
+                <form id="reset" class="nice" action="/api/user/reset" method="post">
+                  <label for="reset-ident">工號</label>
+                  <input type="text" placeholder="00289" class="small input-text"
+                         name="ident" id="reset-ident" maxlength="5">
+                  <button type="submit" class="small green nice button radius">重置</button>
+                </form>
+              </div>
+            </div>
           </li>
 
-          <li class="" id="giftTab">
+          <li class="" id="tt2Tab">
+            <div class="row">
+              <div class="twelve columns">
+                <h4>修改禮物</h4>
+                <form class="nice">
+                  <label>禮物編號</label>
+                  <select name="gift-select">
+                    <option value="">請選擇</option>
+                    {% for gift in gifts %}
+                    <option value="{{ gift.ident }}">{{ gift.ident }}</option>
+                    {% endfor %}
+                  </select>
+                </form>
+              </div>
+            </div>
+            <div class="row">
+              <div class="six columns">
+                <form id="gift" class="nice" action="/api/gift/register" method="post">
+                  <label for="gift-desc">禮物描述</label>
+                  <input type="text" class="input-text" name="desc"
+                         id="gift-desc" value="">
+                  <label for="gift-bless">給對方的祝福語</label>
+                  <input type="text" class="input-text" name="bless"
+                         id="gift-bless" value="">
+                  <input type="hidden" name="ident" value="-1">
+                  <button type="submit" class="green nice button radius">登錄</button>
+                </form>
+              </div>
+              <div class="six columns">
+                <!-- show upload image -->
+                <form id="upload" class="nice" action="/api/gift/upload" method="post" enctype="multipart/form-data">
+                  <label class="question" for="upload-pic">禮物照片</label>
+                  <img class="question" src="images/question.gif" title="（支援 jpg、gif、png，大小不超過 1 MB。）" />
+                  <input type="file" class="input-text" name="pic" id="upload-pic">
+                  <input type="hidden" name="ident" value="-1">
+                  <input type="hidden" name="route" value="welfare">
+                  <input type="hidden" name="fragment" value="tt2">
+                  <button type="submit" class="green nice button radius">上傳</button>
+                </form>
+                <img class="gift-thumbnail" src="" alt="禮物照片" style="display: none;" />
+              </div>
+            </div>
           </li>
 
-          <li class="" id="drawTab">
-        <div class="row">
-          <div class="six columns">
-            <h4>變更抽獎階段</h4>
-            <form id="change" class="nice" action="/api/state/change" method="post">
-              <label>目前階段：<span class="change-state">{{ states[current] }}</span></label>
-              <select name="state">
-                {% for state in states %}
-                <option value="{{ loop.index0 }}" {{ "selected" if current == loop.index0 }}>{{ states[loop.index0] }}</option>
-                {% endfor %}
-              </select>
-              <button type="submit" class="small green nice button radius">變更</button>
-            </form>
-          </div>
-          <div class="six columns draw">
-            <h4>抽獎</h4>
-            <a id="draw" class="small green nice button radius {% if current != 1 %}disabled{% endif %}" href="/api/draw">抽獎</a>
-          </div>
-        </div>
+          <li class="" id="tt3Tab">
+            <div class="row">
+              <div class="six columns">
+                <h4>變更抽獎階段</h4>
+                <form id="change" class="nice" action="/api/state/change" method="post">
+                  <label>目前階段：<span class="change-state">{{ states[current] }}</span></label>
+                  <select name="state">
+                    {% for state in states %}
+                    <option value="{{ loop.index0 }}" {{ "selected" if current == loop.index0 }}>{{ states[loop.index0] }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="small green nice button radius">變更</button>
+                </form>
+              </div>
+              <div class="six columns draw">
+                <h4>抽獎</h4>
+                <a id="draw" class="small green nice button radius {% if current != 1 %}disabled{% endif %}" href="/api/draw">抽獎</a>
+              </div>
+            </div>
           </li>
 
-          <li class="" id="usersTab">
-        <div class="row">
-          <div class="six columns">
-            <h4>資料統計</h4>
-            <a href="/stats">資料統計 »</a>
-          </div>
-        </div>
+          <li class="" id="tt4Tab">
+            <div class="row">
+              <div class="twelve columns">
+                <h5>參與人員共有 {{ users.count() }} 位</h5>
+                <table id="users-table" class="tablesorter">
+                  <thead>
+                    <tr>
+                      <th>工號</th>
+                      <th>權限</th>
+                      <th>主管</th>
+                      <th>登錄時間</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for user in users %}
+                    <tr>
+                      <td>{{ user.ident }}</td>
+                      {% if user.role == 1000 %}
+                      <td>福委</td>
+                      {% elif user.role == 2000 %}
+                      <td>小麋鹿</td>
+                      {% elif user.role == 3000 %}
+                      <td>乖小孩子</td>
+                      {% else %}
+                      <td>{{ user.role }}</td>
+                      {% endif %}
+                      <td>{% if user.executive %}&#10004;{% endif %}</td>
+                      <td>{{ user.created }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </li>
 
-          <li class="" id="giftsTab">
-        <div class="row">
-          <div class="six columns">
-            <h4>資料統計</h4>
-            <a href="/stats">資料統計 »</a>
-          </div>
-        </div>
+          <li class="" id="tt5Tab">
+            <div class="row">
+              <div class="twelve columns">
+                <h5>收到 {{ gifts.count() }} 份禮物</h5>
+                <table id="gifts-table" class="tablesorter">
+                  <thead>
+                    <tr>
+                      <th>編號</th>
+                      <th>完成登錄</th>
+                      <th>提供者</th>
+                      <th>收禮者</th>
+                      <th>登錄時間</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for gift in gifts %}
+                    <tr>
+                      <td>{{ gift.ident }}</td>
+                      <td>{% if gift.is_complete %}&#10004;{% endif %}</td>
+                      <td>{{ gift.giver.ident }}</td>
+                      <td>{{ gift.taker.ident if gift.taker }}</td>
+                      <td>{{ gift.created }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </li>
 
         </ul>
         <hr>
         <div class="row">
           <div id="log" class="twelve columns">
+            {% if args and args.result == 'success' %}
+            <div class="alert-box success">禮物照片上傳成功。</div>
+            {% endif %}
+            {% if args and args.result == 'more' %}
+            <div class="alert-box warning">禮物登錄不完整，還缺：{{ args.more }}。</div>
+            {% endif %}
+            {% if args and args.result == 'invalid' and args.invalid == 'maxFileSize' %}
+            <div class="alert-box error">禮物照片大小不正確，請先縮小至 1 MB 以下。</div>
+            {% elif args and args.result == 'invalid' and args.invalid == 'acceptFileTypes' %}
+            <div class="alert-box error">禮物照片格式不正確，僅支援 jpg、gif、png。</div>
+            {% elif args and args.result == 'invalid' %}
+            <div class="alert-box error">禮物照片不正確。</div>
+            {% endif %}
           </div>
         </div>
 {% endblock %}
@@ -132,4 +234,14 @@
     <a class="close-reveal-modal">×</a>
     <button class="nice red radius button draw">抽獎</button>
   </div>
+{% endblock %}
+
+{% block script %}
+  {% if args and args.ident %}
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('select[name=gift-select]').val('{{ args.ident }}').change();
+    });
+  </script>
+  {% endif %}
 {% endblock %}
