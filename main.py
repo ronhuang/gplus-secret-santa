@@ -255,7 +255,11 @@ class HelperHandler(BaseHandler):
         if self.auth.role > ROLE_HELPER:
             return self.render_template('bad.html')
 
-        self.render_template('helper.html')
+        current = State.get_or_insert('current').state
+        if current == STATE_REGISTER_START:
+            self.render_template('helper.html')
+        else:
+            self.render_template('helper-thank-you.html')
 
 
 class GoodHandler(BaseHandler):
